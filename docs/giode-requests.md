@@ -93,7 +93,33 @@ from `giode build windows-installer` could add the rule, e.g. in giode.toml:
 firewall = true   # netsh advfirewall firewall add rule ... program=<exe> on install, removed on uninstall
 ```
 
-## 6. Nice to have
+## 6. Splash screen color (Android and iOS)
+
+The phone launch screen shows white before the first frame; EasySend's background is
+`#0A0A0B` (dark) and `#F4F4F6` (light). Neither can be set today:
+
+- Android: the CLI's generated `Theme.GioApp` hard-codes
+  `android:windowBackground = @android:color/white`; Android 12+'s system splash takes its
+  background from it too. `[android] application_attributes` can't help, since the
+  activity's own theme wins.
+- iOS: Info.plist gets `UILaunchScreen = true`, an empty launch screen that iOS shows
+  white. A color needs `UILaunchScreen` → `UIColorName` and a named color in an asset
+  catalog, which the CLI doesn't produce.
+
+Suggested giode.toml:
+
+```toml
+[app]
+splash_color = "#0A0A0B"        # both platforms; optional:
+splash_color_light = "#F4F4F6"  # Android values/ vs values-night/, an iOS "Any/Dark" color set
+```
+
+On Android: `windowBackground` (and `windowSplashScreenBackground` in `values-v31`) set to
+the color, plus `windowSplashScreenAnimatedIcon` from the adaptive icon. On iOS: a
+`LaunchBackground` color set in Assets.car and `UILaunchScreen` = `{UIColorName =
+LaunchBackground}`.
+
+## 7. Nice to have
 
 - `TitleBar`'s close button calls `App.Close`, which always quits, so a frameless window
   ignores `CloseToTray`. EasySend handles it through `TitleBar.OnClose` (hide when
