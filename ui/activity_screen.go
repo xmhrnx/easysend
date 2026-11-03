@@ -58,9 +58,8 @@ func (a *activityScreen) content() giode.Element {
 		body = append(body, done...)
 	}
 	if len(active)+len(done) == 0 {
-		s := a.u.eng.Settings.Get()
 		body = append(body, card(giode.Styles{Align: giode.AlignCenter, Padding: giode.UniformInset(40), Gap: 10},
-			orb(s, "history", 64),
+			orb("history", 64),
 			giode.Text("Nothing here yet", stHeading),
 			giode.Text("Transfers you send and receive show up here, with their progress.", stMuted),
 		))

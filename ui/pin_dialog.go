@@ -67,9 +67,8 @@ func (d *pinDialog) submit() {
 }
 
 func (d *pinDialog) content() giode.Element {
-	s := d.u.eng.Settings.Get()
 	return giode.Stack(giode.Styles{Gap: 14, Width: -1, Align: giode.AlignCenter},
-		orb(s, "lock", 60),
+		orb("lock", 60),
 		giode.Text("PIN required", giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 22, Color: "theme.text"}),
 		giode.Text(d.current.peer.Alias+" asks for a PIN. It's shown in their settings.", giode.Styles{FontFamily: fontText, FontSize: 13.5, Color: "theme.muted", TextAlign: giode.TextAlignCenter}),
 		d.input,

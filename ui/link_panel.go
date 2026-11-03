@@ -75,7 +75,6 @@ func option(label string, el giode.Element) giode.Element {
 }
 
 func (p *linkPanel) Layout(gtx layout.Context) layout.Dimensions {
-	s := p.u.eng.Settings.Get()
 	lockRow := []giode.Element{p.lock}
 	if p.lock.Checked() {
 		lockRow = append(lockRow, p.pin)
@@ -83,7 +82,7 @@ func (p *linkPanel) Layout(gtx layout.Context) layout.Dimensions {
 	kids := []giode.Element{
 		card(giode.Styles{},
 			sideBySide(giode.Styles{Width: -1, Gap: 18, Align: giode.AlignCenter},
-				orb(s, "qr", 64),
+				orb("qr", 64),
 				giode.Stack(giode.Styles{Gap: 6, FlexGrow: 1, MinWidth: 240},
 					giode.Text("Share with a link or QR code", stHeading),
 					giode.Text("Anyone can download in their browser — no app needed. Scan the code with a phone camera.", stMuted),

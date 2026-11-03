@@ -39,7 +39,7 @@ func (c *browserDropCard) Layout(gtx layout.Context) layout.Dimensions {
 	s := c.u.eng.Settings.Get()
 	c.on.SetChecked(s.BrowserDrop)
 	kids := []giode.Element{
-		giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter}, orb(s, "qr", 40), giode.Text("Receive from a browser", stHeading)),
+		giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter}, orb("qr", 40), giode.Text("Receive from a browser", stHeading)),
 		giode.Text("No app on the other phone or computer? Let them scan this code and upload in their browser.", stMuted),
 		c.on,
 	}

@@ -7,20 +7,22 @@ import (
 	"easysend/internal/settings"
 )
 
-// accent is a metallic gradient the user can pick. Ink is the text and
-// icon color drawn on top of it.
+// accent is a soft metallic tone the user can pick: a gradient for the
+// call-to-action buttons, a solid tone for highlights, and the ink drawn
+// on top of the gradient.
 type accent struct {
 	Name     string
 	From, To string
+	Solid    string
 	Ink      string
 }
 
 var accents = []accent{
-	{"Gold", "#F2D27C", "#B8862F", "#1B1408"},
-	{"Rose gold", "#F1C3AE", "#B26E55", "#1F110B"},
-	{"Amber", "#FFC56B", "#D9822B", "#1E1205"},
-	{"Champagne", "#F4E7C8", "#C2A06A", "#1C160C"},
-	{"Bronze", "#E2AE74", "#8E5A2C", "#1C1006"},
+	{"Gold", "#E0C894", "#A88A52", "#C8A96B", "#17130C"},
+	{"Rose gold", "#E3C3B4", "#A47665", "#C79A87", "#1A110D"},
+	{"Amber", "#E6C595", "#AE8152", "#CDA06A", "#19110A"},
+	{"Champagne", "#E8DEC8", "#AE9D7E", "#CBBB98", "#18150F"},
+	{"Bronze", "#D5B394", "#86654A", "#B08A67", "#170F09"},
 }
 
 func currentAccent(s settings.Settings) accent {
@@ -34,12 +36,12 @@ func currentAccent(s settings.Settings) accent {
 func applyTheme(s settings.Settings, systemDark bool) {
 	a := currentAccent(s)
 	giode.SetPalette(giode.ModeDark, giode.Palette{
-		Primary: giode.Color(a.From), Accent: giode.Color(a.To), Secondary: giode.Color(a.To),
+		Primary: giode.Color(a.Solid), Accent: giode.Color(a.Solid), Secondary: giode.Color(a.To),
 		Background: "#0D0B09", Surface: "#17140F", Text: "#F5EEE3", Muted: "#A3978A", Border: "#2B251D",
-		OnPrimary: giode.Color(a.Ink), Success: "#8CC08A", Warning: "#E9A84C", Danger: "#E5735F", Info: "#D9B77A",
+		OnPrimary: giode.Color(a.Ink), Success: "#8CC08A", Warning: "#E9A84C", Danger: "#E5735F", Info: "#B8A68A",
 	})
 	giode.SetPalette(giode.ModeLight, giode.Palette{
-		Primary: giode.Color(a.To), Accent: giode.Color(a.To), Secondary: giode.Color(a.To),
+		Primary: giode.Color(a.To), Accent: giode.Color(a.To), Secondary: giode.Color(a.Solid),
 		Background: "#F8F4EC", Surface: "#FFFDF9", Text: "#1E1912", Muted: "#7B6F60", Border: "#E9E0D1",
 		OnPrimary: giode.Color(a.Ink), Success: "#4C8A4A", Warning: "#B9741B", Danger: "#C2462F", Info: "#8C6A2A",
 	})
@@ -61,8 +63,10 @@ func applyTheme(s settings.Settings, systemDark bool) {
 var (
 	colSurface2    = giode.Mix("theme.text", "theme.surface", 0.035)
 	colSurface3    = giode.Mix("theme.text", "theme.surface", 0.07)
-	colPrimarySoft = giode.Mix("theme.primary", "theme.surface", 0.14)
-	colAccentSoft  = giode.Mix("theme.accent", "theme.surface", 0.14)
+	colPrimarySoft = giode.Mix("theme.primary", "theme.surface", 0.1)
+	colAccentSoft  = giode.Mix("theme.accent", "theme.surface", 0.09)
+	colOrbFill     = giode.Mix("theme.primary", "theme.surface", 0.08)
+	colOrbRing     = giode.Mix("theme.primary", "theme.surface", 0.38)
 	colSuccessSoft = giode.Mix("theme.success", "theme.surface", 0.15)
 	colDangerSoft  = giode.Mix("theme.danger", "theme.surface", 0.14)
 	colWarningSoft = giode.Mix("theme.warning", "theme.surface", 0.15)
@@ -97,13 +101,13 @@ func card(st giode.Styles, kids ...giode.Element) giode.Element {
 	return giode.Box(base.With(st), kids...)
 }
 
-// orb is a round, gradient-filled badge holding an icon.
-func orb(s settings.Settings, iconName string, size int) giode.Element {
+// orb is a round badge with a soft accent ring holding an icon.
+func orb(iconName string, size int) giode.Element {
 	return giode.Box(giode.Styles{
-		Width: prop.Width(size), Height: prop.Height(size), BorderRadius: prop.BorderRadius(size / 2), BackgroundGradient: brandGradient(s, 135),
+		Width: prop.Width(size), Height: prop.Height(size), BorderRadius: prop.BorderRadius(size / 2),
+		Background: colOrbFill, BorderWidth: 1, BorderColor: colOrbRing,
 		Align: giode.AlignCenter, Justify: giode.JustifyCenter,
-		BoxShadow: giode.BoxShadow{Y: size / 6, Blur: size / 2, Color: giode.Color(currentAccent(s).To + "55")},
-	}, icon(iconName, size*9/20, currentAccent(s).Ink))
+	}, icon(iconName, size*9/20, "theme.primary"))
 }
 
 // tile is a rounded square with a tinted background and an icon.

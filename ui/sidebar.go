@@ -104,7 +104,7 @@ func (s *sidebar) Layout(gtx layout.Context) layout.Dimensions {
 // logoElement renders the app icon at size dp.
 func (u *UI) logoElement(size int) giode.Element {
 	if u.logo == nil {
-		return orb(u.eng.Settings.Get(), "send", size)
+		return orb("send", size)
 	}
 	return giode.Image(u.logo, giode.Styles{Width: dpW(size), Height: dpH(size)})
 }

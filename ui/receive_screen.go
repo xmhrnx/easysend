@@ -75,9 +75,8 @@ func (r *receiveScreen) hero() giode.Element {
 }
 
 func (r *receiveScreen) codeCard() giode.Element {
-	s := r.u.eng.Settings.Get()
 	return card(giode.Styles{FlexGrow: 1, Width: 0, MinWidth: 300},
-		giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter}, orb(s, "globe", 40), giode.Text("Receive with a code", stHeading)),
+		giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter}, orb("globe", 40), giode.Text("Receive with a code", stHeading)),
 		giode.Text("From anywhere in the world: type the code the sender sees in EasySend, the wormhole command or a Magic Wormhole app.", stMuted),
 		giode.Row(giode.Styles{Width: -1, Gap: 10, Align: giode.AlignCenter, Wrap: giode.WrapNoWrap}, giode.Box(giode.Styles{FlexGrow: 1}, r.code), r.receive),
 	)

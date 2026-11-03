@@ -31,11 +31,10 @@ func (p *internetPanel) start() {
 }
 
 func (p *internetPanel) Layout(gtx layout.Context) layout.Dimensions {
-	s := p.u.eng.Settings.Get()
 	kids := []giode.Element{
 		card(giode.Styles{},
 			sideBySide(giode.Styles{Width: -1, Gap: 18, Align: giode.AlignCenter},
-				orb(s, "globe", 64),
+				orb("globe", 64),
 				giode.Stack(giode.Styles{Gap: 6, FlexGrow: 1, MinWidth: 240},
 					giode.Text("Send anywhere with a code", stHeading),
 					giode.Text("Works across the internet, between any networks. Devices connect directly when they can, through a relay when they can't.", stMuted),

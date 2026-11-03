@@ -24,7 +24,6 @@ func newDropZone(u *UI) *dropZone {
 }
 
 func (d *dropZone) Layout(gtx layout.Context) layout.Dimensions {
-	s := d.u.eng.Settings.Get()
 	_, dragging := d.u.app.FileDrag()
 	compact := len(d.u.items) > 0
 	border, bg := "theme.border", colSurface2
@@ -48,7 +47,7 @@ func (d *dropZone) Layout(gtx layout.Context) layout.Dimensions {
 	if compact {
 		return giode.Row(giode.Styles{Width: -1, Gap: 14, Align: giode.AlignCenter, Padding: giode.UniformInset(16), BorderRadius: 20,
 			Background: giode.Color(bg), BorderWidth: 1, BorderColor: giode.Color(border)},
-			orb(s, "plus", 40),
+			orb("plus", 40),
 			giode.Stack(giode.Styles{Gap: 2, FlexGrow: 1},
 				giode.Text("Add more", stStrong),
 				giode.Text("Drop here or pick more to send together", stMuted)),
@@ -57,7 +56,7 @@ func (d *dropZone) Layout(gtx layout.Context) layout.Dimensions {
 	}
 	return giode.Stack(giode.Styles{Width: -1, Align: giode.AlignCenter, Gap: 10, Padding: giode.Inset{Top: 34, Bottom: 30, Left: 20, Right: 20},
 		BorderRadius: 26, Background: giode.Color(bg), BorderWidth: 2, BorderColor: giode.Color(border)},
-		orb(s, "upload", 72),
+		orb("upload", 72),
 		giode.Box(giode.Styles{Height: 6}),
 		giode.Text(title, giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 22, Color: "theme.text", TextAlign: giode.TextAlignCenter}),
 		giode.Text(sub, giode.Styles{FontFamily: fontText, FontSize: 14, Color: "theme.muted", TextAlign: giode.TextAlignCenter}),
