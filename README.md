@@ -29,7 +29,7 @@ scan a QR code to upload files and messages from their phone's browser.
 - "Send with EasySend" in the file manager's right-click menu; files opened with the app
   are added to the selection; single instance
 - System notifications; keeps transfers alive in the background on phones
-- Warm dark theme with soft gold accents (plus light and system modes) and five metallic accents (gold, rose gold, amber, champagne, bronze); adaptive layout (sidebar on desktop,
+- Dark, outline-only design: neutral dark surfaces with gold only for lines, text and icons (plus light and system modes) and five metallic accents (gold, rose gold, amber, champagne, bronze); adaptive layout (sidebar on desktop,
   tab bar on phones)
 - Separate profiles with `EASYSEND_PROFILE=name` (run several copies side by side)
 

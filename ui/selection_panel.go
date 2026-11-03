@@ -46,7 +46,7 @@ func (p *selectionPanel) row(it item.Item) giode.Element {
 		name, sub, ic = firstLine(it.Text, 60), "Text · "+item.HumanSize(it.Size), "text"
 	}
 	return giode.Row(giode.Styles{Width: -1, Gap: 12, Align: giode.AlignCenter, Wrap: giode.WrapNoWrap},
-		tile(ic, 40, colAccentSoft, "theme.accent"),
+		tile(ic, 40, "theme.accent"),
 		giode.Stack(giode.Styles{FlexGrow: 1, Gap: 2},
 			giode.Text(name, giode.Styles{FontFamily: fontText, FontWeight: giode.FontWeightMedium, FontSize: 14, Color: "theme.text", MaxLines: 1, TextOverflow: giode.TextOverflowEllipsis}),
 			giode.Text(sub, stSmall)),

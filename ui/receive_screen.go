@@ -25,12 +25,12 @@ type receiveScreen struct {
 
 func newReceiveScreen(u *UI) *receiveScreen {
 	r := &receiveScreen{u: u, browser: newBrowserDropCard(u)}
-	r.visible = giode.Input.Switch("Visible to nearby devices", giode.Styles{Color: "theme.text"}).OnChange(func(on bool) {
+	r.visible = newSwitch("Visible to nearby devices", giode.Styles{Color: "theme.text"}).OnChange(func(on bool) {
 		_ = u.eng.UpdateSettings(func(s *settings.Settings) { s.Discoverable = on })
 	})
 	r.code = giode.Input.Text("e.g. 7-crossover-clockwork", giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 12, Color: "theme.text"}).
 		Submit(func(string) { r.start() })
-	r.receive = u.primaryButton("Receive", "download", r.start)
+	r.receive = primaryButton("Receive", "download", r.start)
 	r.scroll = giode.Scroll(r.content, scrollStyles)
 	return r
 }
@@ -51,9 +51,9 @@ func (r *receiveScreen) hero() giode.Element {
 	s := r.u.eng.Settings.Get()
 	self := r.u.eng.Self()
 	r.visible.SetChecked(s.Discoverable)
-	pinChip := chip("No PIN", colSurface3, "theme.muted")
+	pinChip := chip("No PIN", "theme.muted")
 	if s.RequirePIN && s.PIN != "" {
-		pinChip = chip("PIN required", colWarningSoft, "theme.warning")
+		pinChip = chip("PIN required", "theme.warning")
 	}
 	accept := []string{"Asks before saving", "Auto-accepts favorites", "Auto-accepts everyone"}[s.AutoAccept]
 	return card(giode.Styles{Padding: giode.UniformInset(24)},
@@ -64,9 +64,9 @@ func (r *receiveScreen) hero() giode.Element {
 				giode.Text(self.Name, giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 26, Color: "theme.text"}),
 				giode.Text("Nearby devices running EasySend or LocalSend see this name.", stMuted),
 				giode.Row(giode.Styles{Gap: 8},
-					chip(self.IP+":"+strconv.Itoa(self.Port), colSurface3, "theme.text"),
+					chip(self.IP+":"+strconv.Itoa(self.Port), "theme.text"),
 					pinChip,
-					chip(accept, colPrimarySoft, "theme.primary"),
+					chip(accept, "theme.primary"),
 				),
 				giode.Box(giode.Styles{Width: -1, MaxWidth: 360, Padding: giode.Inset{Top: 6}}, r.visible),
 			),

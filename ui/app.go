@@ -51,8 +51,6 @@ type UI struct {
 	compose  *composeDialog
 	address  *addressDialog
 	toasts   *giode.ToasterElement
-
-	primaries []*giode.ButtonElement
 }
 
 // New builds the interface for a running engine.

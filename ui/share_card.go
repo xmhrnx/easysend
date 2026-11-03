@@ -55,14 +55,14 @@ func (c *shareCard) details() string {
 
 func (c *shareCard) Layout(gtx layout.Context) layout.Dimensions {
 	v := c.v
-	status := chip("Live", colSuccessSoft, "theme.success")
+	status := chip("Live", "theme.success")
 	if v.Expired() {
-		status = chip("Ended", colSurface3, "theme.muted")
+		status = chip("Ended", "theme.muted")
 	}
 	left := []giode.Element{
 		giode.Row(giode.Styles{Gap: 8, Align: giode.AlignCenter}, status, func() giode.Element {
 			if v.PIN != "" {
-				return chip("PIN "+v.PIN, colWarningSoft, "theme.warning")
+				return chip("PIN "+v.PIN, "theme.warning")
 			}
 			return giode.Box(giode.Styles{})
 		}()),

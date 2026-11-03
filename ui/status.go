@@ -50,23 +50,22 @@ func statusText(t transfer.Transfer) string {
 func statusChip(t transfer.Transfer) giode.Element {
 	switch t.Status {
 	case transfer.Done:
-		return chip("Done", colSuccessSoft, "theme.success")
+		return chip("Done", "theme.success")
 	case transfer.Canceled:
-		return chip("Canceled", colSurface3, "theme.muted")
+		return chip("Canceled", "theme.muted")
 	case transfer.Declined:
-		return chip("Declined", colWarningSoft, "theme.warning")
+		return chip("Declined", "theme.warning")
 	case transfer.Failed:
-		return chip("Failed", colDangerSoft, "theme.danger")
+		return chip("Failed", "theme.danger")
 	}
-	return chip("In progress", colPrimarySoft, "theme.primary")
+	return chip("In progress", "theme.primary")
 }
 
-// progressBar is a slim gradient bar.
+// progressBar is a slim accent line.
 func (u *UI) progressBar(v float32) giode.Element {
-	s := u.eng.Settings.Get()
 	if v < 0 {
 		v = 0
 	}
-	return giode.Box(giode.Styles{Width: -1, Height: 6, BorderRadius: 3, Background: colSurface3, Overflow: giode.OverflowHidden},
-		giode.Box(giode.Styles{WidthPct: pct(v), Height: 6, BorderRadius: 3, BackgroundGradient: brandGradient(s, 90)}))
+	return giode.Box(giode.Styles{Width: -1, Height: 4, BorderRadius: 2, Background: colSurface3, Overflow: giode.OverflowHidden},
+		giode.Box(giode.Styles{WidthPct: pct(v), Height: 4, BorderRadius: 2, Background: "theme.primary"}))
 }

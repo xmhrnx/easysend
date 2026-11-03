@@ -19,7 +19,7 @@ type browserDropCard struct {
 
 func newBrowserDropCard(u *UI) *browserDropCard {
 	c := &browserDropCard{u: u}
-	c.on = giode.Input.Switch("Accept uploads from browsers", giode.Styles{Color: "theme.text"}).OnChange(func(on bool) {
+	c.on = newSwitch("Accept uploads from browsers", giode.Styles{Color: "theme.text"}).OnChange(func(on bool) {
 		_ = u.eng.UpdateSettings(func(s *settings.Settings) { s.BrowserDrop = on })
 	})
 	c.where = giode.Input.Segmented("Same network", "Internet")

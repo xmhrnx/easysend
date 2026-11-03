@@ -56,7 +56,7 @@ func newSettingsScreen(u *UI) *settingsScreen {
 		return in
 	}
 	sw := func(on bool, fn func(bool)) *toggle.Switch {
-		t := giode.Input.Switch("").OnChange(fn)
+		t := newSwitch("", giode.Styles{}).OnChange(fn)
 		t.SetChecked(on)
 		return t
 	}

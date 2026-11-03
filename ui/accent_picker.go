@@ -27,7 +27,7 @@ func newAccentPicker(u *UI) *accentPicker {
 			}
 			var mark giode.Element = giode.Box(giode.Styles{})
 			if selected {
-				mark = icon("check", 16, ac.Ink)
+				mark = icon("check", 16, "#FFFFFF")
 			}
 			return giode.Box(giode.Styles{Padding: giode.UniformInset(3), BorderRadius: 20, BorderWidth: 2, BorderColor: giode.Color(ring)},
 				giode.Box(giode.Styles{Width: 30, Height: 30, BorderRadius: 15, BackgroundGradient: giode.Linear(135, giode.Color(ac.From), giode.Color(ac.To)),
@@ -35,7 +35,6 @@ func newAccentPicker(u *UI) *accentPicker {
 		}).Label(ac.Name).OnClick(func(giode.ClickEvent) {
 			_ = u.eng.UpdateSettings(func(s *settings.Settings) { s.Accent = i })
 			u.ApplyTheme()
-			u.restyle()
 		})
 		a.swatch = append(a.swatch, p)
 	}

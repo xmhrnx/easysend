@@ -17,7 +17,7 @@ func settingRow(title, desc string, control giode.Element) giode.Element {
 // settingsCard groups related settings under a title.
 func settingsCard(title, iconName string, rows ...giode.Element) giode.Element {
 	kids := []giode.Element{giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter, Padding: giode.Inset{Bottom: 4}},
-		tile(iconName, 32, colPrimarySoft, "theme.primary"), giode.Text(title, stHeading))}
+		tile(iconName, 32, "theme.primary"), giode.Text(title, stHeading))}
 	for i, r := range rows {
 		if i > 0 {
 			kids = append(kids, giode.Divider(giode.Styles{Color: "theme.border"}))
