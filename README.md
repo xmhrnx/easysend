@@ -92,8 +92,7 @@ assets/              icon (SVG sources + PNGs), Android icon layers, Inter font
 - Public browser links need a router with UPnP and a public IP (not carrier-grade NAT);
   otherwise use an internet code, or a tunnel with the public address setting.
 - Not yet in the phone share sheet, and on Android received files stay in the app's
-  storage (hand them on with Share). Both wait on Giode features: see
-  [docs/giode-requests.md](docs/giode-requests.md).
+  storage (hand them on with Share). Both wait on Giode features.
 - On Android, multicast discovery may be filtered by the OS; EasySend falls back to
   scanning the subnet, and devices can be added by IP.
 - The tray needs a status-notifier host on Linux (KDE; GNOME with the AppIndicator

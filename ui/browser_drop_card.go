@@ -54,6 +54,7 @@ func (c *browserDropCard) Layout(gtx layout.Context) layout.Dimensions {
 				giode.Stack(giode.Styles{Gap: 10, FlexGrow: 1, MinWidth: 160},
 					giode.Text(c.url(), giode.Styles{FontFamily: fontText, FontSize: 12.5, Color: "theme.text"}).Selectable("drop-url"),
 					c.copy,
+					otherAddresses(c.u.eng.DropOtherURLs(), "drop-alt"),
 				),
 			),
 		)
