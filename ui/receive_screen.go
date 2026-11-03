@@ -58,7 +58,7 @@ func (r *receiveScreen) hero() giode.Element {
 	accept := []string{"Asks before saving", "Auto-accepts favorites", "Auto-accepts everyone"}[s.AutoAccept]
 	return card(giode.Styles{Padding: giode.UniformInset(24)},
 		sideBySide(giode.Styles{Width: -1, Gap: 24, Align: giode.AlignCenter, Justify: giode.JustifyCenter},
-			radar(s, 170, "inbox"),
+			radar(170, "inbox"),
 			giode.Stack(giode.Styles{Gap: 8, FlexGrow: 1, MinWidth: 260},
 				giode.Text("READY TO RECEIVE", giode.Styles{FontFamily: fontText, FontWeight: giode.FontWeightBold, FontSize: 11, Color: "theme.success"}),
 				giode.Text(self.Name, giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 26, Color: "theme.text"}),
