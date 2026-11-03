@@ -74,6 +74,10 @@ and to adding devices by IP, which work without it. Either:
 
 ## 4. Nice to have
 
+- `TitleBar`'s close button calls `App.Close`, which always quits, so a frameless window
+  ignores `CloseToTray`. EasySend handles it through `TitleBar.OnClose` (hide when
+  close-to-tray is on and the window can be hidden); the bar could do this itself, like
+  the system close button.
 - `app.OpenFolder(path)` to open a folder in the file manager. `Share(ShareFile)` reveals
   a file inside its parent, which suits "Show in folder", but the Settings button that
   opens the downloads folder should open the folder itself.
