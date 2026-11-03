@@ -42,23 +42,20 @@ func main() {
 		u   *ui.UI
 	)
 	app = giode.New(giode.Config{
-		Title:          "EasySend",
-		Size:           image.Pt(1180, 800),
-		MinSize:        image.Pt(380, 560),
-		Resizable:      true,
-		Center:         true,
-		Frameless:      platform.IsDesktop, // the UI draws its own title bar
-		Icon:           assets.Icon,
-		Background:     "theme.background",
-		StatusBar:      "theme.background",
-		NavigationBar:  "theme.surface",
-		MinimizeToTray: s.MinimizeToTray,
-		CloseToTray:    s.CloseToTray,
-		StartInTray:    startInTray,
-		SingleInstanceLock: &giode.SingleInstanceLock{
-			UniqueID:     "app.easysend" + platform.Profile(),
-			OnLaunchArgs: func(args []string) { u.AddPaths(args) },
-		},
+		Title:              "EasySend",
+		Size:               image.Pt(1180, 800),
+		MinSize:            image.Pt(380, 560),
+		Resizable:          true,
+		Center:             true,
+		Frameless:          platform.IsDesktop, // the UI draws its own title bar
+		Icon:               assets.Icon,
+		Background:         "theme.background",
+		StatusBar:          "theme.background",
+		NavigationBar:      "theme.surface",
+		MinimizeToTray:     s.MinimizeToTray,
+		CloseToTray:        s.CloseToTray,
+		StartInTray:        startInTray,
+		SingleInstanceLock: singleInstance(func(args []string) { u.AddPaths(args) }),
 		ContextActions: []giode.ContextAction{
 			{ID: "send", Label: "Send with EasySend", Files: true, Folders: true},
 		},
@@ -100,6 +97,16 @@ func main() {
 	if err := app.Run(func() giode.Element { return u.View() }); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// singleInstance keeps one copy of EasySend running on desktops, handing
+// a second launch's files to it. Phones already run one copy of an app,
+// so there's no lock there.
+func singleInstance(onArgs func([]string)) *giode.SingleInstanceLock {
+	if !platform.IsDesktop {
+		return nil
+	}
+	return &giode.SingleInstanceLock{UniqueID: "app.easysend" + platform.Profile(), OnLaunchArgs: onArgs}
 }
 
 // deviceModel names the hardware for other devices' lists.

@@ -188,6 +188,23 @@ func (e *Engine) LANBase() string {
 	return "http://" + ip + ":" + strconv.Itoa(e.web.Port())
 }
 
+// OtherLANBases are browser addresses on this device's other local
+// addresses (a second adapter), for when the first doesn't open.
+func (e *Engine) OtherLANBases() []string {
+	ips := netutil.LocalIPv4()
+	var out []string
+	for i, ip := range ips {
+		if i == 0 {
+			continue
+		}
+		out = append(out, "http://"+ip.String()+":"+strconv.Itoa(e.web.Port()))
+		if len(out) == 2 {
+			break
+		}
+	}
+	return out
+}
+
 // PublicBase is the internet address of the browser pages, or "".
 func (e *Engine) PublicBase() string {
 	if u := e.Settings.Get().PublicURL; u != "" {

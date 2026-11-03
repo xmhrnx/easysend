@@ -72,7 +72,28 @@ and to adding devices by IP, which work without it. Either:
 - confirmation that apps should do this with their own Java through the `giode/android`
   bridge, in which case EasySend will ship it as app code.
 
-## 4. Nice to have
+## 4. Single-instance lock on Android and iOS (bug)
+
+`host.LockInstance` writes its lock file in `os.TempDir()`, which is `/data/local/tmp` on
+Android, where apps can't write. When the file can't be created it reports a second
+instance, so `Run` returns without drawing and the app shows a white screen. EasySend now
+sets `SingleInstanceLock` only on desktops, but Giode should ignore the lock on Android and
+iOS (the system runs one copy of an app anyway), and an error creating the lock file
+shouldn't be treated as "another copy is running".
+
+## 5. Firewall rule in the Windows installer
+
+EasySend serves files to phones and browsers on the local network, so Windows Firewall
+has to allow incoming connections to it. Today that depends on the user clicking "Allow"
+in Windows' first-run prompt (and on the network being marked Private). The setup program
+from `giode build windows-installer` could add the rule, e.g. in giode.toml:
+
+```toml
+[windows.installer]
+firewall = true   # netsh advfirewall firewall add rule ... program=<exe> on install, removed on uninstall
+```
+
+## 6. Nice to have
 
 - `TitleBar`'s close button calls `App.Close`, which always quits, so a frameless window
   ignores `CloseToTray`. EasySend handles it through `TitleBar.OnClose` (hide when

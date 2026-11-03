@@ -21,6 +21,8 @@ type ShareView struct {
 	webshare.Share
 	LANURL    string
 	PublicURL string
+	// OtherURLs are the link on this device's other local addresses.
+	OtherURLs []string
 }
 
 // CreateShare publishes items as a browser link.
@@ -36,6 +38,9 @@ func (e *Engine) CreateShare(items []item.Item, o ShareOptions) ShareView {
 
 func (e *Engine) view(sh webshare.Share) ShareView {
 	v := ShareView{Share: sh, LANURL: e.LANBase() + "/s/" + sh.Token}
+	for _, b := range e.OtherLANBases() {
+		v.OtherURLs = append(v.OtherURLs, b+"/s/"+sh.Token)
+	}
 	if pub := e.PublicBase(); pub != "" {
 		v.PublicURL = pub + "/s/" + sh.Token
 	}
@@ -56,6 +61,15 @@ func (e *Engine) Shares() []ShareView {
 func (e *Engine) StopShare(token string) {
 	e.web.Remove(token)
 	e.changed()
+}
+
+// DropOtherURLs is the upload link on this device's other local addresses.
+func (e *Engine) DropOtherURLs() []string {
+	var out []string
+	for _, b := range e.OtherLANBases() {
+		out = append(out, b+"/r/"+e.Settings.Get().DropToken)
+	}
+	return out
 }
 
 // DropURLs returns the links where browsers upload to this device.

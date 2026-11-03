@@ -7,12 +7,24 @@ import (
 	"strings"
 )
 
-// LocalIPv4 returns the device's private IPv4 addresses, most likely LAN
-// address first (Wi-Fi/Ethernet over virtual adapters).
+// virtualNames are parts of the names of adapters other devices on the
+// network can't reach: VMs, containers, VPNs and tunnels.
+var virtualNames = []string{
+	"docker", "veth", "br-", "virbr", "vbox", "virtualbox", "vmnet", "vmware", "vethernet", "hyper-v", "wsl",
+	"default switch", "tun", "tap", "utun", "zt", "zerotier", "tailscale", "wg", "wireguard", "hamachi",
+	"radmin", "npcap", "loopback", "bluetooth", "vpn", "ppp", "ipsec", "llw", "awdl", "anpi", "bridge",
+}
+
+// LocalIPv4 returns the device's private IPv4 addresses, the one other
+// devices on the local network most likely reach first: the address of
+// the adapter that carries the default route, unless that's a VPN or
+// virtual adapter, then Wi-Fi and Ethernet before anything virtual.
 func LocalIPv4() []net.IP {
+	route := routeIPv4()
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		return nil
+		// Android 11+ denies apps the interface list.
+		return route
 	}
 	type cand struct {
 		ip    net.IP
@@ -33,11 +45,14 @@ func LocalIPv4() []net.IP {
 				continue
 			}
 			ip := ipn.IP.To4()
-			if ip == nil || ip.IsLinkLocalUnicast() {
+			if ip == nil || ip.IsLinkLocalUnicast() || !ip.IsPrivate() {
 				continue
 			}
-			cands = append(cands, cand{ip, score(ifc.Name, ip)})
+			cands = append(cands, cand{ip, score(ifc.Name, ip, route)})
 		}
+	}
+	if len(cands) == 0 {
+		return route
 	}
 	sort.SliceStable(cands, func(i, j int) bool { return cands[i].score > cands[j].score })
 	out := make([]net.IP, len(cands))
@@ -47,27 +62,49 @@ func LocalIPv4() []net.IP {
 	return out
 }
 
-func score(name string, ip net.IP) int {
-	s := 0
-	if ip.IsPrivate() {
-		s += 10
-	}
-	if ip[0] == 192 && ip[1] == 168 {
-		s += 3
-	}
+// score ranks an address: the routed adapter first, physical adapters
+// next, virtual ones last.
+func score(name string, ip net.IP, route []net.IP) int {
 	n := strings.ToLower(name)
-	for _, v := range []string{"docker", "veth", "br-", "vbox", "vmnet", "virbr", "tun", "tap", "utun", "zt", "tailscale", "wg"} {
-		if strings.Contains(n, v) {
-			s -= 8
-		}
+	if isVirtual(n) {
+		return -10
 	}
-	for _, v := range []string{"wlan", "wi-fi", "wifi", "en0", "eth", "en", "wl"} {
+	s := 0
+	if len(route) > 0 && route[0].Equal(ip) {
+		s += 20
+	}
+	for _, v := range []string{"wlan", "wi-fi", "wifi", "wireless", "ethernet", "en0", "en1", "eth", "wl", "en"} {
 		if strings.HasPrefix(n, v) {
-			s += 2
+			s += 5
 			break
 		}
 	}
 	return s
+}
+
+func isVirtual(name string) bool {
+	for _, v := range virtualNames {
+		if strings.Contains(name, v) {
+			return true
+		}
+	}
+	return false
+}
+
+// routeIPv4 returns the address the system uses to reach other networks:
+// connecting a UDP socket picks the route without sending anything. It
+// also works where the interface list is unavailable.
+func routeIPv4() []net.IP {
+	c, err := net.Dial("udp4", "192.0.2.1:9")
+	if err != nil {
+		return nil
+	}
+	defer c.Close()
+	ip := c.LocalAddr().(*net.UDPAddr).IP.To4()
+	if ip == nil || ip.IsLoopback() || ip.IsUnspecified() {
+		return nil
+	}
+	return []net.IP{ip}
 }
 
 // PrimaryIPv4 returns the most likely LAN address, or "".
