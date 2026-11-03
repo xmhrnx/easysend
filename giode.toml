@@ -54,6 +54,7 @@ arch = "amd64"
 desktop_shortcut = true
 
 [windows.msix]
+publisher = "CN=EasySend"          # must match the signing certificate's subject
 startup_task = true
 
 [linux]
@@ -66,3 +67,11 @@ id = "send"
 label = "Send with EasySend"
 files = true
 folders = true
+
+# GitHub Actions (giode ci writes .github/workflows/release.yml from this;
+# rerun `giode ci -f` after changing it). Builds only when a GitHub release
+# is published, and attaches the packages to that release.
+[ci]
+trigger = "release"
+test = "go vet ./... && go test ./..."
+dispatch = false

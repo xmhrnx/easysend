@@ -101,6 +101,15 @@ assets/              icon (SVG sources + PNGs), Android icon layers, Inter font
 
 Inter is © The Inter Project Authors, under the SIL Open Font License (assets/fonts).
 
+## Releases
+
+`.github/workflows/release.yml` (written by `giode ci` from the `[ci]` section of
+giode.toml) runs only when a GitHub release is published: it runs the tests, builds the
+Linux (.deb, .rpm), Windows (setup .exe, .msix), Android (.apk, .aab), macOS (.dmg) and iOS
+packages, and attaches them to the release. Packages are signed when the repository has
+the signing secrets the workflow names; otherwise they're unsigned. After changing `[ci]`,
+regenerate it with `giode ci -f`.
+
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE).
