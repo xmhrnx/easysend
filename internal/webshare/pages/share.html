@@ -1,0 +1,17 @@
+{{define "share"}}{{template "head" "Download"}}{{template "brand" .Device}}
+<div class="card">
+<div class="top"><div><h1>{{if eq .Count 1}}A file for you{{else}}{{.Count}} items for you{{end}}</h1>
+<p class="sub">From <b>{{.Device}}</b> · {{.Total}}</p></div>
+{{if gt .Count 1}}<a class="btn" href="/s/{{.Token}}/zip"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"/></svg>Download all</a>{{end}}</div>
+{{if .Expires}}<span class="pill" style="margin-top:14px"><i></i>Link active · {{.Expires}}</span>{{end}}
+<div class="list">
+{{range .Files}}<div class="row"><div class="ico">{{if eq .Kind "image"}}<img loading="lazy" src="/s/{{$.Token}}/f/{{.Index}}?inline=1" alt="" onerror="this.replaceWith(document.getElementById('fallback').content.cloneNode(true))">{{else}}{{template "fileicon" .}}{{end}}</div>
+<div class="meta"><div class="name">{{if eq .Kind "text"}}Text message{{else}}{{.Base}}{{end}}</div>
+{{if eq .Kind "text"}}<p class="text" id="t{{.Index}}">{{.Text}}</p>{{else}}<div class="size">{{if .Dir}}{{.Dir}} · {{end}}{{.Size}}</div>{{end}}</div>
+{{if eq .Kind "text"}}<button class="btn small ghost" onclick="copyText('t{{.Index}}',this)">Copy</button>
+{{else}}<a class="btn small" href="/s/{{$.Token}}/f/{{.Index}}" download><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"/></svg>Save</a>{{end}}
+</div>{{end}}
+</div></div>
+<template id="fallback"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4-4L5 21"/></svg></template>
+<script>function copyText(id,b){const t=document.getElementById(id).innerText;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{b.textContent='Copied ✓'},()=>{const r=document.createRange();r.selectNodeContents(document.getElementById(id));const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');b.textContent='Copied ✓'})}</script>
+{{template "foot"}}{{end}}

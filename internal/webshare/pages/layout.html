@@ -1,0 +1,44 @@
+{{define "head"}}<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="/logo.svg">
+<title>{{.}} · EasySend</title>
+<style>
+:root{--bg:#07080F;--panel:rgba(22,24,42,.72);--panel2:#151729;--line:rgba(255,255,255,.08);--text:#EEF0FF;--muted:#9097B8;--brand:#7C5CFF;--brand2:#22D3EE;--ok:#34D399;--bad:#F87171;--grad:linear-gradient(135deg,#8B5CF6,#6366F1 55%,#22D3EE)}
+@media (prefers-color-scheme:light){:root{--bg:#F4F5FB;--panel:rgba(255,255,255,.82);--panel2:#fff;--line:rgba(15,18,40,.09);--text:#11132A;--muted:#5D6385}}
+*{box-sizing:border-box}html,body{margin:0}
+body{min-height:100vh;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Inter,sans-serif;-webkit-font-smoothing:antialiased;padding:max(24px,env(safe-area-inset-top)) 16px 48px;overflow-x:hidden}
+body:before,body:after{content:"";position:fixed;z-index:-1;width:60vmax;height:60vmax;border-radius:50%;filter:blur(90px);opacity:.35;pointer-events:none}
+body:before{background:#7C5CFF;top:-30vmax;left:-20vmax}body:after{background:#22D3EE;bottom:-35vmax;right:-25vmax;opacity:.22}
+.wrap{max-width:720px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+header img{width:40px;height:40px;border-radius:12px;box-shadow:0 8px 30px rgba(124,92,255,.45)}
+header b{font-size:18px;letter-spacing:-.01em}header span{color:var(--muted);font-size:13px;display:block;margin-top:-2px}
+.card{background:var(--panel);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+h1{font-size:28px;line-height:1.15;letter-spacing:-.02em;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 22px}
+.btn{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 22px;border-radius:14px;font:600 15px/1 inherit;color:#fff;background:var(--grad);text-decoration:none;box-shadow:0 10px 30px rgba(99,102,241,.4);transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(99,102,241,.55)}.btn:active{transform:translateY(0)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line);box-shadow:none}
+.btn.small{height:38px;padding:0 14px;border-radius:11px;font-size:14px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.list{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.row{display:flex;align-items:center;gap:14px;padding:12px;border-radius:16px;background:var(--panel2);border:1px solid var(--line)}
+.ico{flex:none;width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(34,211,238,.18));color:var(--brand2);overflow:hidden}
+.ico img{width:100%;height:100%;object-fit:cover}
+.meta{flex:1;min-width:0}.name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.size{color:var(--muted);font-size:13px}
+.text{white-space:pre-wrap;word-break:break-word;font-size:14px;max-height:220px;overflow:auto;margin:6px 0 0;color:var(--text)}
+.top{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding:6px 10px;border-radius:99px;border:1px solid var(--line)}
+.pill i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 12px var(--ok)}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:28px}footer a{color:inherit}
+input,textarea{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font:inherit;outline:none}
+input:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(124,92,255,.2)}
+.err{color:var(--bad);font-size:14px;margin:10px 0 0}
+svg{display:block}
+</style></head><body><div class="wrap">
+{{end}}
+{{define "brand"}}<header><img src="/logo.svg" alt=""><div><b>EasySend</b><span>{{.}}</span></div></header>{{end}}
+{{define "foot"}}<footer>Shared with <b>EasySend</b> — straight from the sender's device, no app or account needed.</footer></div></body></html>{{end}}
+{{define "fileicon"}}{{if eq .Kind "image"}}<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4-4L5 21"/></svg>{{else if eq .Kind "video"}}<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="15" height="14" rx="3"/><path d="m17 10 5-3v10l-5-3"/></svg>{{else if eq .Kind "audio"}}<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>{{else if eq .Kind "text"}}<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>{{else}}<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>{{end}}{{end}}

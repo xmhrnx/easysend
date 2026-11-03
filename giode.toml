@@ -1,0 +1,69 @@
+# giode.toml configures how the giode CLI builds EasySend.
+# Reference: https://github.com/xmhrnx/giode-cli#giodetoml
+
+[app]
+name = "EasySend"
+id = "app.easysend"
+version = "1.0.0"
+build = 1
+icon = "assets/icon.png"
+package = "."
+platforms = ["windows", "macos", "linux", "android", "ios"]
+publisher = "EasySend"
+description = "Send files, folders and text nearby, over the internet, or to any browser."
+website = ""
+
+[android]
+min_sdk = 24
+permissions = [
+  "network",
+  "networkstate",
+  "notifications",
+  "foreground_service",
+  "android.permission.ACCESS_WIFI_STATE",
+  "android.permission.CHANGE_WIFI_MULTICAST_STATE",
+]
+keep_alive = true            # App.KeepAlive keeps transfers running in the background
+application_attributes = { requestLegacyExternalStorage = "true", usesCleartextTraffic = "true" }
+icon_foreground = "assets/android-foreground.png"
+icon_background = "assets/android-background.png"
+icon_monochrome = "assets/android-monochrome.png"
+# keystore = "release.keystore"   # created by giode keystore; signs giode build -release
+
+[ios]
+min_os = 15
+
+[ios.usage]
+local_network = "EasySend finds nearby devices and exchanges files with them on your network."
+
+[ios.plist]
+NSBonjourServices = ["_localsend._tcp"]
+UIFileSharingEnabled = true
+LSSupportsOpeningDocumentsInPlace = true
+ITSAppUsesNonExemptEncryption = false
+
+[macos]
+min_os = 11
+
+[macos.usage]
+local_network = "EasySend finds nearby devices and exchanges files with them on your network."
+
+[windows]
+arch = "amd64"
+
+[windows.installer]
+desktop_shortcut = true
+
+[windows.msix]
+startup_task = true
+
+[linux]
+categories = ["Network", "FileTransfer", "Utility"]
+description = "EasySend sends files, folders and text between devices: nearby with discovery (compatible with LocalSend), anywhere over the internet with a short code (compatible with Magic Wormhole), and to anyone with a browser through a link or QR code."
+license = "MIT"
+
+[[context_actions]]
+id = "send"
+label = "Send with EasySend"
+files = true
+folders = true
