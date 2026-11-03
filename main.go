@@ -47,6 +47,7 @@ func main() {
 		MinSize:        image.Pt(380, 560),
 		Resizable:      true,
 		Center:         true,
+		Frameless:      platform.IsDesktop, // the UI draws its own title bar
 		Icon:           assets.Icon,
 		Background:     "theme.background",
 		StatusBar:      "theme.background",

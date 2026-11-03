@@ -39,6 +39,7 @@ type UI struct {
 	// items is what the user picked to send.
 	items []item.Item
 
+	frame     *windowFrame // nil on phones
 	sidebar   *sidebar
 	bottomNav *bottomNav
 	send      *sendScreen
@@ -60,6 +61,9 @@ func New(app *giode.App, eng *engine.Engine) *UI {
 		u.logo = img
 	}
 	u.toasts = giode.Toaster().Placement(giode.ToastBottomCenter).Max(3)
+	if platform.IsDesktop {
+		u.frame = newWindowFrame(u)
+	}
 	u.sidebar = newSidebar(u)
 	u.bottomNav = newBottomNav(u)
 	u.send = newSendScreen(u)
@@ -101,7 +105,13 @@ func (u *UI) View() giode.Element {
 			)
 		}},
 	)
-	return giode.Stack(giode.Styles{Width: -1, Height: -1}, append([]giode.Element{giode.Box(giode.Styles{Width: -1, Height: -1}, body)}, overlays...)...)
+	main := giode.Box(giode.Styles{Width: -1, Height: -1}, body)
+	if u.frame != nil {
+		main = giode.Stack(giode.Styles{Width: -1, Height: -1, Wrap: giode.WrapNoWrap},
+			u.frame,
+			giode.Box(giode.Styles{Width: -1, FlexGrow: 1}, body))
+	}
+	return giode.Stack(giode.Styles{Width: -1, Height: -1}, append([]giode.Element{main}, overlays...)...)
 }
 
 func (u *UI) page() giode.Element {
