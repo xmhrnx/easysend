@@ -48,8 +48,8 @@ func newSettingsScreen(u *UI) *settingsScreen {
 			u.toast(giode.ToastError, "Couldn't save settings: "+err.Error())
 		}
 	}
-	field := func(placeholder, value string, w int, save func(string)) *input.Input {
-		in := giode.Input.Text(placeholder, giode.Styles{Width: dpW(w), Background: colSurface2, BorderColor: "theme.border", BorderRadius: 10, Color: "theme.text"})
+	field := func(placeholder, value string, save func(string)) *input.Input {
+		in := giode.Input.Text(placeholder, giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 10, Color: "theme.text"})
 		in.SetText(value)
 		in.Submit(save)
 		in.OnBlur(func() { save(in.Text()) })
@@ -61,7 +61,7 @@ func newSettingsScreen(u *UI) *settingsScreen {
 		return t
 	}
 
-	s.name = field("Device name", cur.DeviceName, 240, func(v string) {
+	s.name = field("Device name", cur.DeviceName, func(v string) {
 		if v != "" && v != u.eng.Settings.Get().DeviceName {
 			update(func(st *settings.Settings) { st.DeviceName = v })
 			u.toast(giode.ToastSuccess, "Name updated")
@@ -72,6 +72,7 @@ func newSettingsScreen(u *UI) *settingsScreen {
 		u.ApplyTheme()
 	})
 	s.theme.SetSelected(int(cur.Theme))
+	s.theme.Styles(giode.Styles{Width: -1})
 
 	s.folder = softButton("Change…", "folder", s.pickFolder)
 	s.openFolder = softButton("Open", "external", u.openReceivedFolder)
@@ -79,7 +80,8 @@ func newSettingsScreen(u *UI) *settingsScreen {
 		update(func(st *settings.Settings) { st.AutoAccept = settings.AutoAccept(i) })
 	})
 	s.accept.SetSelected(int(cur.AutoAccept))
-	s.pin = field("PIN", cur.PIN, 110, func(v string) { update(func(st *settings.Settings) { st.PIN = v }) })
+	s.accept.Styles(giode.Styles{Width: -1})
+	s.pin = field("PIN", cur.PIN, func(v string) { update(func(st *settings.Settings) { st.PIN = v }) })
 	s.pin.Keyboard(giode.KeyboardNumeric)
 	s.requirePIN = sw(cur.RequirePIN, func(on bool) { update(func(st *settings.Settings) { st.RequirePIN = on }) })
 	s.notify = sw(cur.Notifications, func(on bool) { update(func(st *settings.Settings) { st.Notifications = on }) })
@@ -102,9 +104,9 @@ func newSettingsScreen(u *UI) *settingsScreen {
 
 	s.discoverable = sw(cur.Discoverable, func(on bool) { update(func(st *settings.Settings) { st.Discoverable = on }) })
 	s.upnp = sw(cur.UPnP, func(on bool) { update(func(st *settings.Settings) { st.UPnP = on }) })
-	s.publicURL = field("https://files.example.com", cur.PublicURL, 260, func(v string) { update(func(st *settings.Settings) { st.PublicURL = v }) })
-	s.rendezvous = field("Default (relay.magic-wormhole.io)", cur.RendezvousURL, 260, func(v string) { update(func(st *settings.Settings) { st.RendezvousURL = v }) })
-	s.relay = field("Default (transit.magic-wormhole.io)", cur.TransitRelay, 260, func(v string) { update(func(st *settings.Settings) { st.TransitRelay = v }) })
+	s.publicURL = field("https://files.example.com", cur.PublicURL, func(v string) { update(func(st *settings.Settings) { st.PublicURL = v }) })
+	s.rendezvous = field("Default (relay.magic-wormhole.io)", cur.RendezvousURL, func(v string) { update(func(st *settings.Settings) { st.RendezvousURL = v }) })
+	s.relay = field("Default (transit.magic-wormhole.io)", cur.TransitRelay, func(v string) { update(func(st *settings.Settings) { st.TransitRelay = v }) })
 
 	s.scroll = giode.Scroll(s.content, scrollStyles)
 	return s
@@ -145,21 +147,22 @@ func (s *settingsScreen) content() giode.Element {
 	if platform.ReceivesToDownloads {
 		saveTo = "Downloads › EasySend"
 	}
-	pinControls := []giode.Element{s.requirePIN}
-	if cur.RequirePIN {
-		pinControls = append([]giode.Element{s.pin}, pinControls...)
-	}
 
+	var pinRow giode.Element = giode.Box(giode.Styles{Display: giode.DisplayNone})
+	if cur.RequirePIN {
+		pinRow = settingBlock("PIN", "Tell it to people who send to you.", s.pin, 160)
+	}
 	body := []giode.Element{
 		settingsCard("Profile & look", "sparkles",
-			settingRow("Device name", "How you appear to nearby devices and on browser pages.", s.name),
-			settingRow("Appearance", "", giode.Box(giode.Styles{Width: 280}, s.theme)),
-			settingRow("Accent color", "", s.accent),
+			settingBlock("Device name", "How you appear to nearby devices and on browser pages.", s.name, 260),
+			settingBlock("Appearance", "", s.theme, 280),
+			settingBlock("Accent color", "", s.accent, 240),
 		),
 		settingsCard("Receiving", "inbox",
-			settingRow("Save files to", saveTo, giode.Row(giode.Styles{Gap: 8}, folderControls...)),
-			settingRow("Accept automatically", "Save without asking from favorites (star a device) or from everyone.", giode.Box(giode.Styles{Width: 300}, s.accept)),
-			settingRow("Require a PIN", "Senders must type this PIN before you get a request.", giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter}, pinControls...)),
+			settingBlock("Save files to", saveTo, giode.Row(giode.Styles{Gap: 8}, folderControls...), 220),
+			settingBlock("Accept automatically", "Save without asking from favorites (star a device) or from everyone.", s.accept, 300),
+			settingRow("Require a PIN", "Senders must type this PIN before you get a request.", s.requirePIN),
+			pinRow,
 			settingRow("Notifications", "Tell me when something arrives.", s.notify),
 		),
 	}
@@ -175,12 +178,12 @@ func (s *settingsScreen) content() giode.Element {
 		settingsCard("Network", "wifi",
 			settingRow("Visible to nearby devices", "Answer EasySend and LocalSend discovery on this network.", s.discoverable),
 			settingRow("Open browser links to the internet", s.upnpStatus(), s.upnp),
-			settingRow("Public address", "Optional: your own domain or tunnel that forwards to port "+strconv.Itoa(self.WebPort)+".", s.publicURL),
+			settingBlock("Public address", "Optional: your own domain or tunnel that forwards to port "+strconv.Itoa(self.WebPort)+".", s.publicURL, 260),
 			settingRow("Ports", "Nearby: "+strconv.Itoa(self.Port)+" (LocalSend protocol, HTTPS) · Browser: "+strconv.Itoa(self.WebPort), giode.Box(giode.Styles{})),
 		),
 		settingsCard("Internet transfers", "globe",
-			settingRow("Rendezvous server", "Leave empty for the public Magic Wormhole server.", s.rendezvous),
-			settingRow("Transit relay", "Used only when a direct connection isn't possible.", s.relay),
+			settingBlock("Rendezvous server", "Leave empty for the public Magic Wormhole server.", s.rendezvous, 260),
+			settingBlock("Transit relay", "Used only when a direct connection isn't possible.", s.relay, 260),
 		),
 		settingsCard("About", "info",
 			settingRow("EasySend "+version(), "Nearby transfers speak the open LocalSend protocol; internet transfers speak Magic Wormhole. Both are end-to-end encrypted.", giode.Box(giode.Styles{})),

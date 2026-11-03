@@ -51,7 +51,11 @@ func (c *deviceCard) content(ps giode.PressState) giode.Element {
 	if sub == "" {
 		sub = p.IP
 	}
-	return giode.Stack(giode.Styles{Width: 196, Gap: 12, Padding: giode.UniformInset(16), Background: giode.Color(bg), BorderRadius: 20,
+	size := giode.Styles{Width: 196}
+	if giode.Compact() {
+		size = giode.Styles{WidthPct: 47}
+	}
+	return giode.Stack(giode.Styles{Width: size.Width, WidthPct: size.WidthPct, Gap: 12, Padding: giode.UniformInset(16), Background: giode.Color(bg), BorderRadius: 20,
 		BorderWidth: 1, BorderColor: giode.Color(border), BoxShadow: shadow, Transition: giode.StyleTransition{Duration: 120e6}},
 		giode.Row(giode.Styles{Width: -1, Align: giode.AlignStart, Wrap: giode.WrapNoWrap},
 			orb(deviceIcon(p.DeviceType), 52),

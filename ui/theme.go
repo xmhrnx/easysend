@@ -90,6 +90,10 @@ func card(st giode.Styles, kids ...giode.Element) giode.Element {
 		Background: "theme.surface", BorderRadius: 22, BorderWidth: 1, BorderColor: "theme.border",
 		Width: -1,
 	}
+	if giode.Compact() {
+		base.Padding = giode.UniformInset(16)
+		base.BorderRadius = 18
+	}
 	return giode.Box(base.With(st), kids...)
 }
 

@@ -7,6 +7,7 @@ import (
 	"context"
 	"image"
 	"log"
+	"net/url"
 	"sync"
 
 	"github.com/xmhrnx/giode"
@@ -64,6 +65,7 @@ func main() {
 			OnLaunchArgs: func(args []string) { u.AddPaths(args) },
 		},
 		OnShareReceived: func(s giode.SharedContent) { u.ReceiveShare(s) },
+		OnOpenURL:       func(link *url.URL) { u.OpenLink(link) },
 		OnBackground:    discovery.stop,
 		OnForeground:    discovery.start,
 		ContextActions: []giode.ContextAction{
