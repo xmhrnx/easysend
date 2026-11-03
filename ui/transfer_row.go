@@ -1,25 +1,13 @@
 package ui
 
 import (
-	"path/filepath"
-
 	"gioui.org/layout"
 	"github.com/xmhrnx/giode"
 	"github.com/xmhrnx/giode/components/iconbutton"
 
 	"easysend/internal/engine"
 	"easysend/internal/transfer"
-	"easysend/ui/platform"
 )
-
-// openIcon and openLabel name the action on received files: the file
-// manager on desktops, the share sheet on phones.
-var openIcon, openLabel = func() (string, string) {
-	if platform.IsDesktop {
-		return "folder", "Show in folder"
-	}
-	return "external", "Share"
-}()
 
 // transferRow is one transfer in a list, with its actions.
 type transferRow struct {
@@ -33,7 +21,7 @@ func (u *UI) transferRowFor(t transfer.Transfer) *transferRow {
 	r := giode.Keyed("transfer", t.ID, func() *transferRow {
 		r := &transferRow{u: u}
 		r.cancel = iconAction("x", "Cancel", func() { u.eng.Transfers.Cancel(r.t.ID) })
-		r.open = iconAction(openIcon, openLabel, func() { u.reveal(r.savedPath()) })
+		r.open = iconAction("folder", showReceivedLabel, func() { u.showReceived(r.t) })
 		r.copy = iconAction("copy", "Copy text", func() { u.copy(r.t.Text, "Text") })
 		r.remove = iconAction("trash", "Remove from history", func() {
 			id := r.t.ID
@@ -44,29 +32,6 @@ func (u *UI) transferRowFor(t transfer.Transfer) *transferRow {
 	})
 	r.t = t
 	return r
-}
-
-// savedPath is what "Show in folder" reveals: the single file, or the
-// folder the files went to.
-func (r *transferRow) savedPath() string {
-	var saved []string
-	for _, f := range r.t.Files {
-		if f.Saved != "" {
-			saved = append(saved, f.Saved)
-		}
-	}
-	switch {
-	case len(saved) == 1:
-		return saved[0]
-	case len(saved) > 1 && platform.IsDesktop:
-		return filepath.Dir(saved[0])
-	case len(saved) > 1:
-		return "" // phones share files, not folders
-	}
-	if !platform.IsDesktop {
-		return ""
-	}
-	return r.t.Folder
 }
 
 func (r *transferRow) Layout(gtx layout.Context) layout.Dimensions {
@@ -104,7 +69,7 @@ func (r *transferRow) Layout(gtx layout.Context) layout.Dimensions {
 		if t.Text != "" {
 			actions = append(actions, r.copy)
 		}
-		if t.Direction == transfer.Incoming && t.Status == transfer.Done && r.savedPath() != "" && t.Text == "" {
+		if t.Direction == transfer.Incoming && t.Status == transfer.Done && len(savedFiles(t)) > 0 && t.Text == "" {
 			actions = append(actions, r.open)
 		}
 		actions = append(actions, statusChip(t), r.remove)

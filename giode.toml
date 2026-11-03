@@ -12,6 +12,9 @@ platforms = ["windows", "macos", "linux", "android", "ios"]
 publisher = "EasySend"
 description = "Send files, folders and text nearby, over the internet, or to any browser."
 website = ""
+splash_color = "#0A0A0B"        # launch screen (dark mode)
+splash_color_light = "#F4F4F6"  # launch screen (light mode)
+share_target = true             # in the phone share sheet for files and text
 
 [android]
 min_sdk = 24
@@ -21,7 +24,6 @@ permissions = [
   "notifications",
   "foreground_service",
   "android.permission.ACCESS_WIFI_STATE",
-  "android.permission.CHANGE_WIFI_MULTICAST_STATE",
 ]
 keep_alive = true            # App.KeepAlive keeps transfers running in the background
 icon_foreground = "assets/android-foreground.png"
@@ -52,6 +54,7 @@ arch = "amd64"
 
 [windows.installer]
 desktop_shortcut = true
+firewall = true              # let phones and browsers on the local network reach EasySend
 
 [windows.msix]
 publisher = "CN=EasySend"          # must match the signing certificate's subject

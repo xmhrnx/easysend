@@ -28,22 +28,11 @@ func newWindowFrame(u *UI) *windowFrame {
 		Background: "theme.background", Color: "theme.text", Height: 40,
 		FontSize: 13, FontWeight: giode.FontWeightSemiBold,
 		BorderWidth: 1, BorderColor: "theme.border",
-	}).Variant(variant).Icon(u.logoElement(18)).OnClose(f.close).
+	}).Variant(variant).Icon(u.logoElement(18)).
 		Trailing(giode.Raw(func(gtx layout.Context) layout.Dimensions {
 			return giode.Box(giode.Styles{Padding: giode.Inset{Right: 8, Left: 8}}, f.status()).Layout(gtx)
 		}))
 	return f
-}
-
-// close keeps the app running in the tray when the user chose
-// close-to-tray and the platform can hide the window; otherwise the
-// window closes. (TitleBar's own close always quits.)
-func (f *windowFrame) close() bool {
-	if !f.u.app.CloseToTray() || !giode.TraySupported() {
-		return true
-	}
-	f.u.app.HideWindow()
-	return f.u.app.WindowVisible() // couldn't hide (Wayland): close instead
 }
 
 // status summarizes what's happening for the bar: active transfers, or

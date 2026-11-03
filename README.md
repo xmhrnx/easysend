@@ -26,7 +26,7 @@ scan a QR code to upload files and messages from their phone's browser.
 - "Show in folder" for received files; one-tap copy for received text
 - Tray icon with quick actions, minimize/close to tray, **start at login** (opens quietly
   in the tray), always-start-hidden option
-- "Send with EasySend" in the file manager's right-click menu; files opened with the app
+- "Share → EasySend" from any app on Android and iOS; "Send with EasySend" in the desktop file manager's right-click menu; files opened with the app
   are added to the selection; single instance
 - System notifications; keeps transfers alive in the background on phones
 - Dark, outline-only design: neutral dark surfaces with gold only for lines, text and icons (plus light and system modes) and five metallic accents (gold, rose gold, amber, champagne, bronze); adaptive layout (sidebar on desktop,
@@ -91,10 +91,8 @@ assets/              icon (SVG sources + PNGs), Android icon layers, Inter font
 
 - Public browser links need a router with UPnP and a public IP (not carrier-grade NAT);
   otherwise use an internet code, or a tunnel with the public address setting.
-- Not yet in the phone share sheet, and on Android received files stay in the app's
-  storage (hand them on with Share). Both wait on Giode features.
-- On Android, multicast discovery may be filtered by the OS; EasySend falls back to
-  scanning the subnet, and devices can be added by IP.
+- iOS device builds need App IDs for the app and its share extension, the App Group
+  `group.app.easysend` on both, and the extension's profile in `ios.share_profile`.
 - The tray needs a status-notifier host on Linux (KDE; GNOME with the AppIndicator
   extension). On Wayland, hiding the window and close-to-tray aren't available.
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -311,8 +312,49 @@ func (c *ctxReader) Read(p []byte) (int, error) {
 	return n, err
 }
 
+// onReceived finishes a completed incoming transfer: publishes its files
+// (in the background: they may be large) and tells the user.
 func (e *Engine) onReceived(t transfer.Transfer) {
-	e.notify("Received from "+t.Peer, t.Title()+" · "+item.HumanSize(t.Total))
+	go func() {
+		if e.cfg.Publish != nil {
+			e.publish(t)
+		}
+		e.notify("Received from "+t.Peer, t.Title()+" · "+item.HumanSize(t.Total))
+	}()
+}
+
+// publish hands each saved file of t to Config.Publish and records where
+// it went. A failure leaves the file where it was saved.
+func (e *Engine) publish(t transfer.Transfer) {
+	ctx := context.Background()
+	for i, f := range t.Files {
+		if f.Saved == "" {
+			continue
+		}
+		var files []string
+		_ = filepath.WalkDir(f.Saved, func(p string, d fs.DirEntry, err error) error {
+			if err == nil && d.Type().IsRegular() {
+				files = append(files, p)
+			}
+			return nil
+		})
+		var last string
+		for _, p := range files {
+			dst, err := e.cfg.Publish(ctx, p)
+			if err != nil {
+				e.Transfers.Update(t.ID, func(t *transfer.Transfer) { t.Error = "Kept in app storage: " + err.Error() })
+				continue
+			}
+			os.Remove(p)
+			last = dst
+		}
+		if last != "" {
+			if len(files) > 1 {
+				os.RemoveAll(f.Saved) // the emptied folder
+			}
+			e.Transfers.Update(t.ID, func(t *transfer.Transfer) { t.Files[i].Saved = last })
+		}
+	}
 }
 
 func (e *Engine) recordText(method transfer.Method, from, text string) {
