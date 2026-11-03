@@ -27,7 +27,6 @@ func radar(s settings.Settings, size int, iconName string) giode.Element {
 			alpha := (1 - phase) * 0.4
 			p.Arc(c, c, rad, 2, 0, 360, fmt.Sprintf("rgba(%d,%d,%d,%.3f)", r, g, b, alpha))
 		}
-		p.Circle(c, c, maxR*0.34, fmt.Sprintf("rgba(%d,%d,%d,0.06)", r, g, b))
 		kit.RequestFrame(p.Context())
 	})
 	orbSize := size * 30 / 100

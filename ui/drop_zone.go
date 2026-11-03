@@ -28,7 +28,7 @@ func (d *dropZone) Layout(gtx layout.Context) layout.Dimensions {
 	compact := len(d.u.items) > 0
 	border, bg := "theme.border", colSurface2
 	if dragging {
-		border, bg = "theme.primary", colTint
+		border, bg = "theme.primary", colSurface3
 	}
 	buttons := []giode.Element{d.files}
 	if platform.IsDesktop {

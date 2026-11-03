@@ -7,10 +7,10 @@ import (
 )
 
 // primaryStyles are the call-to-action buttons: an accent outline and
-// accent text on the surface (the outlined variant tints it faintly on
-// hover and press).
+// accent text on the surface; hover and press tint it with a neutral
+// shade, never the accent.
 var primaryStyles = giode.Styles{
-	BorderColor: "theme.primary", Background: "theme.primary", Color: "theme.primary", BorderWidth: 1,
+	BorderColor: "theme.primary", Background: "theme.text", Color: "theme.primary", BorderWidth: 1,
 	FontWeight: giode.FontWeightSemiBold, BorderRadius: 12, FontSize: 14, Padding: giode.SymmetricInset(18, 10),
 }
 

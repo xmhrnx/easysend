@@ -36,13 +36,13 @@ func applyTheme(s settings.Settings, systemDark bool) {
 	a := currentAccent(s)
 	giode.SetPalette(giode.ModeDark, giode.Palette{
 		Primary: giode.Color(a.Solid), Accent: giode.Color(a.Solid), Secondary: giode.Color(a.Solid),
-		Background: "#0D0B09", Surface: "#151310", Text: "#F2ECE2", Muted: "#9C9284", Border: "#2A2621",
-		OnPrimary: "#0D0B09", Success: "#8CC08A", Warning: "#E0A85A", Danger: "#E07A66", Info: "#B8A68A",
+		Background: "#0A0A0B", Surface: "#141416", Text: "#EDEDEF", Muted: "#8E8E96", Border: "#26262B",
+		OnPrimary: "#0A0A0B", Success: "#8CC08A", Warning: "#E0A85A", Danger: "#E07A66", Info: "#A1A1AA",
 	})
 	giode.SetPalette(giode.ModeLight, giode.Palette{
 		Primary: giode.Color(a.To), Accent: giode.Color(a.To), Secondary: giode.Color(a.To),
-		Background: "#F7F4EE", Surface: "#FFFEFB", Text: "#1E1A15", Muted: "#766C60", Border: "#E6DFD3",
-		OnPrimary: "#FFFEFB", Success: "#4C8A4A", Warning: "#A8681A", Danger: "#B9442E", Info: "#7D6544",
+		Background: "#F4F4F6", Surface: "#FFFFFF", Text: "#18181B", Muted: "#6B6B74", Border: "#E4E4E8",
+		OnPrimary: "#FFFFFF", Success: "#4C8A4A", Warning: "#A8681A", Danger: "#B9442E", Info: "#52525B",
 	})
 	dark := systemDark
 	switch s.Theme {
@@ -59,14 +59,14 @@ func applyTheme(s settings.Settings, systemDark bool) {
 }
 
 // Shared colors. Mixed with theme tokens, they follow light/dark switches.
-// Surfaces stay neutral; the accent only draws lines, text and icons.
+// Surfaces are neutral dark (or white); the accent only draws lines, text
+// and icons.
 var (
 	colSurface2 = giode.Mix("theme.text", "theme.surface", 0.035)
 	colSurface3 = giode.Mix("theme.text", "theme.surface", 0.07)
 	colHover    = giode.Mix("theme.text", "theme.surface", 0.06)
 	colPressed  = giode.Mix("theme.text", "theme.surface", 0.1)
 	colRing     = giode.Mix("theme.primary", "theme.surface", 0.45)
-	colTint     = giode.Mix("theme.primary", "theme.surface", 0.05)
 )
 
 // line is a color token softened into a hairline outline.
