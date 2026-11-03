@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><g transform="translate(512 512) scale(0.72) translate(-521 -512)"><g id="mark" fill="none" stroke="#000" stroke-width="58" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M610 300 H392 Q330 300 330 362 V662 Q330 724 392 724 H610"/>
-    <path d="M330 512 H712"/>
-    <path d="M626 426 L712 512 L626 598"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><g transform="translate(512 512) scale(0.92) translate(-512 -512)"><g id="mark" fill="none" stroke="#000">
+    <circle cx="512" cy="512" r="150" stroke-width="14" stroke-opacity="0.95"/>
+    <circle cx="512" cy="512" r="240" stroke-width="11" stroke-opacity="0.6"/>
+    <circle cx="512" cy="512" r="330" stroke-width="8" stroke-opacity="0.32"/>
+    <circle cx="512" cy="512" r="70" fill="#000" stroke="none"/>
   </g>
 </g></svg>
