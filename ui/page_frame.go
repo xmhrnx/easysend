@@ -36,6 +36,14 @@ func sectionTitle(title string, trailing ...giode.Element) giode.Element {
 // scrollStyles is the scrollbar look shared by the screens.
 var scrollStyles = giode.Styles{ScrollBar: giode.ScrollBar{Width: 6, ThumbColor: colSurface3, TrackColor: "transparent", Inset: 4, AutoHide: true}}
 
+// compactOr picks a size for phones or for wide windows.
+func compactOr(phone, wide int) int {
+	if giode.Compact() {
+		return phone
+	}
+	return wide
+}
+
 // sideBySide lays kids in a row on wide windows and lets them wrap onto
 // several lines on phones.
 func sideBySide(st giode.Styles, kids ...giode.Element) giode.Element {

@@ -3,8 +3,8 @@ package ui
 import (
 	"gioui.org/layout"
 	"github.com/xmhrnx/giode"
-	"github.com/xmhrnx/giode/components/dialog"
 	"github.com/xmhrnx/giode/components/input"
+	"github.com/xmhrnx/giode/components/sheet"
 
 	"easysend/internal/engine"
 	"easysend/internal/item"
@@ -21,7 +21,7 @@ type pendingSend struct {
 type pinDialog struct {
 	u       *UI
 	open    bool
-	dlg     *dialog.Dialog
+	sheet   *sheet.Sheet
 	input   *input.Input
 	send    *giode.ButtonElement
 	cancel  *giode.ButtonElement
@@ -34,9 +34,9 @@ func newPINDialog(u *UI) *pinDialog {
 	d := &pinDialog{u: u, sends: map[string]pendingSend{}, shown: map[string]bool{}}
 	d.input = giode.Input.Text("PIN", giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 12, Color: "theme.text", FontSize: 20}).
 		Keyboard(giode.KeyboardNumeric).Submit(func(string) { d.submit() })
-	d.send = primaryButton("Send", "send", d.submit)
-	d.cancel = softButton("Cancel", "", func() { d.open = false })
-	d.dlg = giode.Dialog(&d.open, d.content, giode.Styles{Background: "theme.surface", BorderRadius: 26, Width: 380})
+	d.send = sheetPrimary("Send", "send", d.submit)
+	d.cancel = sheetSecondary("Cancel", func() { d.open = false })
+	d.sheet = newSheet(&d.open, "", d.content, func() giode.Element { return sheetActions(d.cancel, d.send) })
 	return d
 }
 
@@ -72,7 +72,6 @@ func (d *pinDialog) content() giode.Element {
 		giode.Text("PIN required", giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 22, Color: "theme.text"}),
 		giode.Text(d.current.peer.Alias+" asks for a PIN. It's shown in their settings.", giode.Styles{FontFamily: fontText, FontSize: 13.5, Color: "theme.muted", TextAlign: giode.TextAlignCenter}),
 		d.input,
-		giode.Row(giode.Styles{Gap: 10, Width: -1, Justify: giode.JustifyEnd}, d.cancel, d.send),
 	)
 }
 
@@ -89,5 +88,5 @@ func (d *pinDialog) Layout(gtx layout.Context) layout.Dimensions {
 			d.input.Focus()
 		}
 	}
-	return d.dlg.Layout(gtx)
+	return d.sheet.Layout(gtx)
 }

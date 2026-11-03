@@ -8,8 +8,10 @@ import (
 	"image"
 	_ "image/png" // logo decoding
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/xmhrnx/giode"
 
@@ -323,6 +325,25 @@ func (u *UI) openReceivedFolder() {
 func isFile(p string) bool {
 	st, err := os.Stat(p)
 	return err == nil && !st.IsDir()
+}
+
+// OpenLink handles a link that opened the app: a scanned internet code
+// (wormhole-transfer:7-crossover-clockwork) starts receiving it.
+func (u *UI) OpenLink(link *url.URL) {
+	if link.Scheme != "wormhole-transfer" {
+		return
+	}
+	code := link.Opaque
+	if code == "" {
+		code = strings.TrimPrefix(link.Host+link.Path, "/")
+	}
+	if code == "" {
+		return
+	}
+	u.eng.ReceiveInternet(code)
+	u.current = screenActivity
+	u.app.ShowWindow()
+	u.toast(giode.ToastInfo, "Receiving with code "+code+"…")
 }
 
 // ReceiveShare adds what another app shared through the system share

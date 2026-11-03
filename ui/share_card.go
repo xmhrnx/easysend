@@ -77,7 +77,7 @@ func (c *shareCard) Layout(gtx layout.Context) layout.Dimensions {
 		giode.Row(giode.Styles{Gap: 10}, c.copy, c.stop),
 	)
 	if c.where.Selected() == 0 || v.PublicURL == "" {
-		left = append(left, otherAddresses(v.OtherURLs, "url-alt-"+v.Token))
+		left = append(left, linkHelp(v.OtherURLs, "url-alt-"+v.Token))
 	}
 	return card(giode.Styles{},
 		sideBySide(giode.Styles{Width: -1, Gap: 22, Align: giode.AlignCenter},

@@ -3,8 +3,8 @@ package ui
 import (
 	"gioui.org/layout"
 	"github.com/xmhrnx/giode"
-	"github.com/xmhrnx/giode/components/dialog"
 	"github.com/xmhrnx/giode/components/input"
+	"github.com/xmhrnx/giode/components/sheet"
 
 	"easysend/internal/item"
 )
@@ -13,7 +13,7 @@ import (
 type composeDialog struct {
 	u      *UI
 	isOpen bool
-	dlg    *dialog.Dialog
+	sheet  *sheet.Sheet
 	text   *input.Input
 	add    *giode.ButtonElement
 	cancel *giode.ButtonElement
@@ -22,9 +22,9 @@ type composeDialog struct {
 func newComposeDialog(u *UI) *composeDialog {
 	d := &composeDialog{u: u}
 	d.text = giode.Input.Text("Type a message, a link, a password…", giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 12, Color: "theme.text"}).Lines(5, 12)
-	d.add = primaryButton("Add", "plus", d.submit)
-	d.cancel = softButton("Cancel", "", func() { d.isOpen = false })
-	d.dlg = giode.Dialog(&d.isOpen, d.content, giode.Styles{Background: "theme.surface", BorderRadius: 26, Width: 520})
+	d.add = sheetPrimary("Add", "plus", d.submit)
+	d.cancel = sheetSecondary("Cancel", func() { d.isOpen = false })
+	d.sheet = newSheet(&d.isOpen, "Send text", d.content, func() giode.Element { return sheetActions(d.cancel, d.add) })
 	return d
 }
 
@@ -43,12 +43,10 @@ func (d *composeDialog) submit() {
 }
 
 func (d *composeDialog) content() giode.Element {
-	return giode.Stack(giode.Styles{Gap: 14, Width: -1},
-		giode.Text("Send text", giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 22, Color: "theme.text"}),
+	return giode.Stack(giode.Styles{Gap: 12, Width: -1},
 		giode.Text("Receivers can copy it with one tap.", stMuted),
 		d.text,
-		giode.Row(giode.Styles{Gap: 10, Width: -1, Justify: giode.JustifyEnd}, d.cancel, d.add),
 	)
 }
 
-func (d *composeDialog) Layout(gtx layout.Context) layout.Dimensions { return d.dlg.Layout(gtx) }
+func (d *composeDialog) Layout(gtx layout.Context) layout.Dimensions { return d.sheet.Layout(gtx) }

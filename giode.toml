@@ -15,6 +15,7 @@ website = ""
 splash_color = "#0A0A0B"        # launch screen (dark mode)
 splash_color_light = "#F4F4F6"  # launch screen (light mode)
 share_target = true             # in the phone share sheet for files and text
+schemes = ["wormhole-transfer"]  # internet codes scanned as QR codes open EasySend
 
 [android]
 min_sdk = 24
@@ -55,6 +56,7 @@ arch = "amd64"
 [windows.installer]
 desktop_shortcut = true
 firewall = true              # let phones and browsers on the local network reach EasySend
+firewall_public = true       # also on networks Windows marks Public (many home Wi-Fi)
 
 [windows.msix]
 publisher = "CN=EasySend"          # must match the signing certificate's subject

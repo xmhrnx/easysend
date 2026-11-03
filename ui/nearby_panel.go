@@ -36,7 +36,7 @@ func (n *nearbyPanel) Layout(gtx layout.Context) layout.Dimensions {
 	if len(peers) == 0 {
 		return card(giode.Styles{Align: giode.AlignCenter, Gap: 6},
 			head,
-			radar(200, "wifi"),
+			radar(compactOr(150, 200), "wifi"),
 			giode.Text("Looking for devices on your network…", stStrong),
 			giode.Text("Open EasySend or LocalSend on the other device and join the same Wi-Fi.", giode.Styles{FontFamily: fontText, FontSize: 13, Color: "theme.muted", TextAlign: giode.TextAlignCenter}),
 		).Layout(gtx)
