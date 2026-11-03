@@ -59,7 +59,7 @@ startup_task = true
 [linux]
 categories = ["Network", "FileTransfer", "Utility"]
 description = "EasySend sends files, folders and text between devices: nearby with discovery (compatible with LocalSend), anywhere over the internet with a short code (compatible with Magic Wormhole), and to anyone with a browser through a link or QR code."
-license = "MIT"
+license = "Apache-2.0"
 
 [[context_actions]]
 id = "send"

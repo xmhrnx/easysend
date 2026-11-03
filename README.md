@@ -100,3 +100,7 @@ assets/              icon (SVG sources + PNGs), Android icon layers, Inter font
   extension). On Wayland, hiding the window and close-to-tray aren't available.
 
 Inter is © The Inter Project Authors, under the SIL Open Font License (assets/fonts).
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE).
