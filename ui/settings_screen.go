@@ -74,7 +74,7 @@ func newSettingsScreen(u *UI) *settingsScreen {
 	s.theme.SetSelected(int(cur.Theme))
 
 	s.folder = softButton("Change…", "folder", s.pickFolder)
-	s.openFolder = softButton("Open", "external", func() { u.reveal(u.eng.Settings.Get().DownloadDir) })
+	s.openFolder = softButton("Open", "external", u.openReceivedFolder)
 	s.accept = giode.Input.Segmented("Ask", "Favorites", "Everyone").OnChange(func(i int) {
 		update(func(st *settings.Settings) { st.AutoAccept = settings.AutoAccept(i) })
 	})
@@ -137,9 +137,13 @@ func (s *settingsScreen) content() giode.Element {
 	s.syncSwitches(cur)
 	self := s.u.eng.Self()
 
-	var folderControls []giode.Element
+	folderControls := []giode.Element{s.openFolder}
 	if platform.IsDesktop {
-		folderControls = append(folderControls, s.openFolder, s.folder)
+		folderControls = append(folderControls, s.folder)
+	}
+	saveTo := cur.DownloadDir
+	if platform.ReceivesToDownloads {
+		saveTo = "Downloads › EasySend"
 	}
 	pinControls := []giode.Element{s.requirePIN}
 	if cur.RequirePIN {
@@ -153,7 +157,7 @@ func (s *settingsScreen) content() giode.Element {
 			settingRow("Accent color", "", s.accent),
 		),
 		settingsCard("Receiving", "inbox",
-			settingRow("Save files to", cur.DownloadDir, giode.Row(giode.Styles{Gap: 8}, folderControls...)),
+			settingRow("Save files to", saveTo, giode.Row(giode.Styles{Gap: 8}, folderControls...)),
 			settingRow("Accept automatically", "Save without asking from favorites (star a device) or from everyone.", giode.Box(giode.Styles{Width: 300}, s.accept)),
 			settingRow("Require a PIN", "Senders must type this PIN before you get a request.", giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter}, pinControls...)),
 			settingRow("Notifications", "Tell me when something arrives.", s.notify),

@@ -12,6 +12,10 @@ import (
 // IsDesktop is true on Windows, macOS and Linux.
 const IsDesktop = true
 
+// ReceivesToDownloads says received files are published to the system
+// Downloads (Engine Config.Publish) rather than kept where they arrive.
+const ReceivesToDownloads = false
+
 // DeviceType is the LocalSend device type.
 const DeviceType = localsend.TypeDesktop
 

@@ -174,16 +174,22 @@ func (r *Registry) Start(t Transfer, cancel context.CancelFunc) string {
 	return t.ID
 }
 
-// Update changes a transfer.
+// Update changes a transfer. Changes to a finished one (where its files
+// went) are saved to the history.
 func (r *Registry) Update(id string, fn func(*Transfer)) {
 	r.mu.Lock()
 	t, ok := r.items[id]
+	finished := false
 	if ok {
 		fn(t)
+		finished = t.Status.Finished()
 	}
 	r.mu.Unlock()
 	if ok {
 		r.changed()
+	}
+	if finished {
+		r.save()
 	}
 }
 

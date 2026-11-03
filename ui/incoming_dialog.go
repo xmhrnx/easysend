@@ -28,7 +28,7 @@ func newIncomingDialog(u *UI) *incomingDialog {
 	d := &incomingDialog{u: u}
 	d.accept = primaryButton("Accept", "check", func() { d.answer(true) })
 	d.decline = softButton("Decline", "", func() { d.answer(false) })
-	d.trust = giode.Input.Checkbox("Always accept from this device", giode.Styles{Color: "theme.text", Background: "theme.primary", BorderColor: "theme.border"})
+	d.trust = giode.Input.Checkbox("Always accept from this device", giode.Styles{Color: "theme.text", Background: "theme.primary", BorderColor: "theme.border"}).Outlined(true)
 	d.dlg = giode.Dialog(&d.open, d.content, giode.Styles{Background: "theme.surface", BorderRadius: 26, Width: 440}).Dismissible(false)
 	return d
 }

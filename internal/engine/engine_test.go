@@ -109,3 +109,39 @@ func TestShareLinks(t *testing.T) {
 		t.Fatal("not stopped")
 	}
 }
+
+func TestPublishMovesReceivedFiles(t *testing.T) {
+	a, b := newEngine(t, "Alice"), newEngine(t, "Bob")
+	published := t.TempDir()
+	b.cfg.Publish = func(ctx context.Context, p string) (string, error) {
+		dst := filepath.Join(published, filepath.Base(p))
+		data, err := os.ReadFile(p)
+		if err != nil {
+			return "", err
+		}
+		return "content://downloads/" + filepath.Base(p), os.WriteFile(dst, data, 0o644)
+	}
+	_ = b.UpdateSettings(func(s *settings.Settings) { s.AutoAccept = settings.AcceptEveryone })
+	dev, err := a.AddByAddress(context.Background(), "127.0.0.1:"+strconv.Itoa(b.Self().Port))
+	if err != nil {
+		t.Fatal(err)
+	}
+	src := filepath.Join(t.TempDir(), "doc.pdf")
+	_ = os.WriteFile(src, []byte("pdf"), 0o644)
+	it, _ := item.FromFile(src)
+	a.SendNearby(dev, []item.Item{it}, "")
+	waitFor(t, func() bool {
+		for _, tr := range b.Transfers.List() {
+			if tr.Direction == transfer.Incoming && len(tr.Files) == 1 && tr.Files[0].Saved == "content://downloads/doc.pdf" {
+				return true
+			}
+		}
+		return false
+	})
+	if _, err := os.Stat(filepath.Join(b.Settings.Get().DownloadDir, "doc.pdf")); !os.IsNotExist(err) {
+		t.Fatal("original not removed")
+	}
+	if got, _ := os.ReadFile(filepath.Join(published, "doc.pdf")); string(got) != "pdf" {
+		t.Fatal("not published")
+	}
+}

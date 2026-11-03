@@ -34,6 +34,10 @@ type Config struct {
 	OnChange func()
 	// Notify shows a system notification.
 	Notify func(title, body string)
+	// Publish, when set, moves a received file from DownloadDir to where
+	// the user finds it (Android's Downloads) and returns its new
+	// location. The original is removed once it succeeds.
+	Publish func(ctx context.Context, path string) (string, error)
 }
 
 // Engine is the running app core.
