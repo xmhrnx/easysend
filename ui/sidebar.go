@@ -51,7 +51,7 @@ func (s *sidebar) item(e navEntry, ps giode.PressState) giode.Element {
 	}
 	if n := s.u.badge(e.screen); n > 0 {
 		kids = append(kids, giode.Box(giode.Styles{BackgroundGradient: brandGradient(s.u.eng.Settings.Get(), 135), BorderRadius: 99, Padding: giode.SymmetricInset(8, 2)},
-			giode.Text(strconv.Itoa(n), giode.Styles{FontFamily: fontText, FontWeight: giode.FontWeightBold, FontSize: 11, Color: "#FFFFFF"})))
+			giode.Text(strconv.Itoa(n), giode.Styles{FontFamily: fontText, FontWeight: giode.FontWeightBold, FontSize: 11, Color: giode.Color(currentAccent(s.u.eng.Settings.Get()).Ink)})))
 	}
 	return giode.Row(giode.Styles{Width: -1, Gap: 12, Align: giode.AlignCenter, Padding: giode.SymmetricInset(14, 11), BorderRadius: 12, Background: giode.Color(bg), Wrap: giode.WrapNoWrap}, kids...)
 }

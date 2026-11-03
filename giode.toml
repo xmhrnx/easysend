@@ -24,7 +24,6 @@ permissions = [
   "android.permission.CHANGE_WIFI_MULTICAST_STATE",
 ]
 keep_alive = true            # App.KeepAlive keeps transfers running in the background
-application_attributes = { requestLegacyExternalStorage = "true", usesCleartextTraffic = "true" }
 icon_foreground = "assets/android-foreground.png"
 icon_background = "assets/android-background.png"
 icon_monochrome = "assets/android-monochrome.png"

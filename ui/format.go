@@ -85,8 +85,8 @@ func timeAgo(t time.Time) string {
 
 // avatarPairs are gradient pairs for device avatars.
 var avatarPairs = [][2]string{
-	{"#8B5CF6", "#22D3EE"}, {"#F97316", "#EC4899"}, {"#10B981", "#3B82F6"},
-	{"#F43F5E", "#F59E0B"}, {"#6366F1", "#A855F7"}, {"#14B8A6", "#84CC16"},
+	{"#C8963E", "#7A4E1D"}, {"#D9785A", "#86392A"}, {"#B58A4C", "#5B452A"},
+	{"#E0A458", "#9A5A2C"}, {"#A88C66", "#4E3B2A"}, {"#C47B5A", "#6E3A2E"},
 }
 
 // avatarGradient picks a stable gradient for a seed.

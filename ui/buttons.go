@@ -9,9 +9,9 @@ import (
 func (u *UI) primaryStyles() giode.Styles {
 	s := u.eng.Settings.Get()
 	return giode.Styles{
-		BackgroundGradient: brandGradient(s, 120), Color: "#FFFFFF", BorderRadius: 12,
+		BackgroundGradient: brandGradient(s, 120), Color: giode.Color(currentAccent(s).Ink), FontWeight: giode.FontWeightSemiBold, BorderRadius: 12,
 		FontSize: 14, Padding: giode.SymmetricInset(18, 11),
-		BoxShadow: giode.BoxShadow{Y: 6, Blur: 18, Color: giode.Color(currentAccent(s).From + "55")},
+		BoxShadow: giode.BoxShadow{Y: 6, Blur: 18, Color: giode.Color(currentAccent(s).To + "44")},
 	}
 }
 

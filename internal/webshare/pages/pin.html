@@ -1,6 +1,6 @@
 {{define "pin"}}{{template "head" "Enter PIN"}}{{template "brand" .Device}}
 <div class="card" style="max-width:420px;margin:0 auto;text-align:center">
-<div style="width:64px;height:64px;border-radius:50%;margin:4px auto 16px;display:grid;place-items:center;background:var(--grad);box-shadow:0 12px 36px rgba(99,102,241,.5)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+<div style="width:64px;height:64px;border-radius:50%;margin:4px auto 16px;display:grid;place-items:center;background:var(--grad);box-shadow:0 12px 36px rgba(226,182,84,.4)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B1408" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
 <h1>Protected link</h1><p class="sub">Enter the PIN shown on {{.Device}}.</p>
 <form method="post" action="{{.Back}}/pin"><input name="pin" inputmode="numeric" autocomplete="one-time-code" autofocus placeholder="PIN" style="text-align:center;font-size:22px;letter-spacing:.3em">
 {{if .Error}}<p class="err">{{.Error}}</p>{{end}}

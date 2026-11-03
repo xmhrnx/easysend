@@ -137,9 +137,9 @@ func (s *settingsScreen) content() giode.Element {
 	s.syncSwitches(cur)
 	self := s.u.eng.Self()
 
-	folderControls := []giode.Element{s.openFolder}
+	var folderControls []giode.Element
 	if platform.IsDesktop {
-		folderControls = append(folderControls, s.folder)
+		folderControls = append(folderControls, s.openFolder, s.folder)
 	}
 	pinControls := []giode.Element{s.requirePIN}
 	if cur.RequirePIN {

@@ -7,18 +7,20 @@ import (
 	"easysend/internal/settings"
 )
 
-// accent is a pair of brand colors the user can pick.
+// accent is a metallic gradient the user can pick. Ink is the text and
+// icon color drawn on top of it.
 type accent struct {
 	Name     string
 	From, To string
+	Ink      string
 }
 
 var accents = []accent{
-	{"Aurora", "#7C5CFF", "#22D3EE"},
-	{"Sunset", "#F97316", "#EC4899"},
-	{"Emerald", "#10B981", "#0EA5E9"},
-	{"Orchid", "#D946EF", "#6366F1"},
-	{"Ember", "#EF4444", "#F59E0B"},
+	{"Gold", "#F2D27C", "#B8862F", "#1B1408"},
+	{"Rose gold", "#F1C3AE", "#B26E55", "#1F110B"},
+	{"Amber", "#FFC56B", "#D9822B", "#1E1205"},
+	{"Champagne", "#F4E7C8", "#C2A06A", "#1C160C"},
+	{"Bronze", "#E2AE74", "#8E5A2C", "#1C1006"},
 }
 
 func currentAccent(s settings.Settings) accent {
@@ -28,18 +30,18 @@ func currentAccent(s settings.Settings) accent {
 	return accents[0]
 }
 
-// applyTheme sets the palettes and mode from the settings.
+// applyTheme sets the warm palettes and the mode from the settings.
 func applyTheme(s settings.Settings, systemDark bool) {
 	a := currentAccent(s)
 	giode.SetPalette(giode.ModeDark, giode.Palette{
 		Primary: giode.Color(a.From), Accent: giode.Color(a.To), Secondary: giode.Color(a.To),
-		Background: "#08090F", Surface: "#11121C", Text: "#ECEEFF", Muted: "#8A8FAD", Border: "#23253A",
-		OnPrimary: "#FFFFFF", Success: "#34D399", Warning: "#FBBF24", Danger: "#F87171", Info: "#60A5FA",
+		Background: "#0D0B09", Surface: "#17140F", Text: "#F5EEE3", Muted: "#A3978A", Border: "#2B251D",
+		OnPrimary: giode.Color(a.Ink), Success: "#8CC08A", Warning: "#E9A84C", Danger: "#E5735F", Info: "#D9B77A",
 	})
 	giode.SetPalette(giode.ModeLight, giode.Palette{
-		Primary: giode.Color(a.From), Accent: giode.Color(a.To), Secondary: giode.Color(a.To),
-		Background: "#F2F3F9", Surface: "#FFFFFF", Text: "#12142A", Muted: "#646A88", Border: "#E3E5F0",
-		OnPrimary: "#FFFFFF", Success: "#059669", Warning: "#D97706", Danger: "#DC2626", Info: "#2563EB",
+		Primary: giode.Color(a.To), Accent: giode.Color(a.To), Secondary: giode.Color(a.To),
+		Background: "#F8F4EC", Surface: "#FFFDF9", Text: "#1E1912", Muted: "#7B6F60", Border: "#E9E0D1",
+		OnPrimary: giode.Color(a.Ink), Success: "#4C8A4A", Warning: "#B9741B", Danger: "#C2462F", Info: "#8C6A2A",
 	})
 	dark := systemDark
 	switch s.Theme {
@@ -100,8 +102,8 @@ func orb(s settings.Settings, iconName string, size int) giode.Element {
 	return giode.Box(giode.Styles{
 		Width: prop.Width(size), Height: prop.Height(size), BorderRadius: prop.BorderRadius(size / 2), BackgroundGradient: brandGradient(s, 135),
 		Align: giode.AlignCenter, Justify: giode.JustifyCenter,
-		BoxShadow: giode.BoxShadow{Y: size / 6, Blur: size / 2, Color: giode.Color(currentAccent(s).From + "66")},
-	}, icon(iconName, size*9/20, "#FFFFFF"))
+		BoxShadow: giode.BoxShadow{Y: size / 6, Blur: size / 2, Color: giode.Color(currentAccent(s).To + "55")},
+	}, icon(iconName, size*9/20, currentAccent(s).Ink))
 }
 
 // tile is a rounded square with a tinted background and an icon.

@@ -2,16 +2,16 @@
 <div class="card">
 <h1>Send to {{.Device}}</h1><p class="sub">Files go straight to this device over your network.</p>
 <label id="zone" class="zone"><input id="pick" type="file" multiple hidden>
-<div class="orb"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V7m0 0-5 5m5-5 5 5M5 3h14"/></svg></div>
+<div class="orb"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1B1408" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V7m0 0-5 5m5-5 5 5M5 3h14"/></svg></div>
 <b>Tap to choose files</b><span>or drop them here</span></label>
 <div class="list" id="list"></div>
 <div style="margin-top:22px"><textarea id="msg" rows="3" placeholder="…or type a message"></textarea>
 <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn small" id="sendText">Send message</button></div></div>
 <p class="err" id="err"></p>
 </div>
-<style>.zone{display:flex;flex-direction:column;align-items:center;gap:6px;padding:38px 16px;border-radius:20px;border:1.5px dashed rgba(124,92,255,.55);background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(34,211,238,.08));cursor:pointer;text-align:center;transition:.2s}
-.zone.over{border-color:var(--brand2);background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(34,211,238,.2));transform:scale(1.01)}.zone span{color:var(--muted);font-size:14px}
-.orb{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--grad);box-shadow:0 12px 36px rgba(99,102,241,.55);margin-bottom:8px}
+<style>.zone{display:flex;flex-direction:column;align-items:center;gap:6px;padding:38px 16px;border-radius:20px;border:1.5px dashed rgba(226,182,84,.5);background:linear-gradient(135deg,rgba(242,210,124,.06),rgba(169,122,42,.08));cursor:pointer;text-align:center;transition:.2s}
+.zone.over{border-color:var(--brand2);background:linear-gradient(135deg,rgba(242,210,124,.16),rgba(169,122,42,.2));transform:scale(1.01)}.zone span{color:var(--muted);font-size:14px}
+.orb{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--grad);box-shadow:0 12px 36px rgba(226,182,84,.4);margin-bottom:8px}
 .bar{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;width:0;background:var(--grad);transition:width .2s}
 .done .bar i{background:var(--ok)}</style>
 <script>

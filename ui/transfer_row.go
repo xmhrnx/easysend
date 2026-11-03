@@ -9,7 +9,17 @@ import (
 
 	"easysend/internal/engine"
 	"easysend/internal/transfer"
+	"easysend/ui/platform"
 )
+
+// openIcon and openLabel name the action on received files: the file
+// manager on desktops, the share sheet on phones.
+var openIcon, openLabel = func() (string, string) {
+	if platform.IsDesktop {
+		return "folder", "Show in folder"
+	}
+	return "external", "Share"
+}()
 
 // transferRow is one transfer in a list, with its actions.
 type transferRow struct {
@@ -23,7 +33,7 @@ func (u *UI) transferRowFor(t transfer.Transfer) *transferRow {
 	r := giode.Keyed("transfer", t.ID, func() *transferRow {
 		r := &transferRow{u: u}
 		r.cancel = iconAction("x", "Cancel", func() { u.eng.Transfers.Cancel(r.t.ID) })
-		r.open = iconAction("folder", "Show in folder", func() { u.reveal(r.savedPath()) })
+		r.open = iconAction(openIcon, openLabel, func() { u.reveal(r.savedPath()) })
 		r.copy = iconAction("copy", "Copy text", func() { u.copy(r.t.Text, "Text") })
 		r.remove = iconAction("trash", "Remove from history", func() {
 			id := r.t.ID
@@ -48,8 +58,13 @@ func (r *transferRow) savedPath() string {
 	switch {
 	case len(saved) == 1:
 		return saved[0]
-	case len(saved) > 1:
+	case len(saved) > 1 && platform.IsDesktop:
 		return filepath.Dir(saved[0])
+	case len(saved) > 1:
+		return "" // phones share files, not folders
+	}
+	if !platform.IsDesktop {
+		return ""
 	}
 	return r.t.Folder
 }
