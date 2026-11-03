@@ -18,7 +18,7 @@ type internetPanel struct {
 
 func newInternetPanel(u *UI) *internetPanel {
 	p := &internetPanel{u: u}
-	p.create = u.primaryButton("Create code", "zap", p.start)
+	p.create = primaryButton("Create code", "zap", p.start)
 	return p
 }
 
@@ -42,9 +42,9 @@ func (p *internetPanel) Layout(gtx layout.Context) layout.Dimensions {
 				p.create,
 			),
 			giode.Row(giode.Styles{Gap: 8},
-				chip("End-to-end encrypted", colSuccessSoft, "theme.success"),
-				chip("Peer-to-peer", colPrimarySoft, "theme.primary"),
-				chip("Works with Magic Wormhole apps", colAccentSoft, "theme.accent"),
+				chip("End-to-end encrypted", "theme.success"),
+				chip("Peer-to-peer", "theme.primary"),
+				chip("Works with Magic Wormhole apps", "theme.accent"),
 			),
 		),
 	}

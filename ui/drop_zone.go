@@ -16,7 +16,7 @@ type dropZone struct {
 func newDropZone(u *UI) *dropZone {
 	return &dropZone{
 		u:      u,
-		files:  u.primaryButton("Files", "file", u.pickFiles),
+		files:  primaryButton("Files", "file", u.pickFiles),
 		folder: softButton("Folder", "folder", u.pickFolder),
 		text:   softButton("Text", "text", func() { u.compose.open() }),
 		paste:  softButton("Paste", "clipboard", u.pasteText),
@@ -28,7 +28,7 @@ func (d *dropZone) Layout(gtx layout.Context) layout.Dimensions {
 	compact := len(d.u.items) > 0
 	border, bg := "theme.border", colSurface2
 	if dragging {
-		border, bg = "theme.primary", colPrimarySoft
+		border, bg = "theme.primary", colTint
 	}
 	buttons := []giode.Element{d.files}
 	if platform.IsDesktop {

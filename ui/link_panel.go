@@ -47,9 +47,9 @@ func newLinkPanel(u *UI) *linkPanel {
 	p.expiry = giode.Input.Select(sel, exp...)
 	p.expiry.SetSelected(1)
 	p.limit = giode.Input.Select(sel, lim...)
-	p.lock = giode.Input.Switch("", giode.Styles{})
+	p.lock = newSwitch("", giode.Styles{})
 	p.pin = giode.Input.Text("PIN", giode.Styles{Width: 110, Background: colSurface2, BorderColor: "theme.border", BorderRadius: 10, Color: "theme.text"}).Keyboard(giode.KeyboardNumeric)
-	p.create = u.primaryButton("Create link", "link", p.start)
+	p.create = primaryButton("Create link", "link", p.start)
 	return p
 }
 

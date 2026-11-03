@@ -28,14 +28,14 @@ func (b *bottomNav) item(e navEntry, ps giode.PressState) giode.Element {
 	fg := "theme.muted"
 	pill := "transparent"
 	if active {
-		fg, pill = "theme.primary", colPrimarySoft
+		fg, pill = "theme.primary", colRing
 	}
 	ic := icon(e.icon, 21, fg)
 	if n := b.u.badge(e.screen); n > 0 {
 		ic = giode.Badge("").On(ic)
 	}
 	return giode.Stack(giode.Styles{Width: -1, Align: giode.AlignCenter, Gap: 4, Padding: giode.SymmetricInset(0, 8)},
-		giode.Box(giode.Styles{Background: giode.Color(pill), BorderRadius: 99, Padding: giode.SymmetricInset(18, 4)}, ic),
+		giode.Box(giode.Styles{BorderWidth: 1, BorderColor: giode.Color(pill), BorderRadius: 99, Padding: giode.SymmetricInset(18, 4)}, ic),
 		giode.Text(e.label, giode.Styles{FontFamily: fontText, FontSize: 11.5, FontWeight: giode.FontWeightMedium, Color: giode.Color(fg)}),
 	)
 }

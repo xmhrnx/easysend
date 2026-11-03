@@ -34,7 +34,7 @@ func newPINDialog(u *UI) *pinDialog {
 	d := &pinDialog{u: u, sends: map[string]pendingSend{}, shown: map[string]bool{}}
 	d.input = giode.Input.Text("PIN", giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 12, Color: "theme.text", FontSize: 20}).
 		Keyboard(giode.KeyboardNumeric).Submit(func(string) { d.submit() })
-	d.send = u.primaryButton("Send", "send", d.submit)
+	d.send = primaryButton("Send", "send", d.submit)
 	d.cancel = softButton("Cancel", "", func() { d.open = false })
 	d.dlg = giode.Dialog(&d.open, d.content, giode.Styles{Background: "theme.surface", BorderRadius: 26, Width: 380})
 	return d

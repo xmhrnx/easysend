@@ -22,7 +22,7 @@ type composeDialog struct {
 func newComposeDialog(u *UI) *composeDialog {
 	d := &composeDialog{u: u}
 	d.text = giode.Input.Text("Type a message, a link, a password…", giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 12, Color: "theme.text"}).Lines(5, 12)
-	d.add = u.primaryButton("Add", "plus", d.submit)
+	d.add = primaryButton("Add", "plus", d.submit)
 	d.cancel = softButton("Cancel", "", func() { d.isOpen = false })
 	d.dlg = giode.Dialog(&d.isOpen, d.content, giode.Styles{Background: "theme.surface", BorderRadius: 26, Width: 520})
 	return d

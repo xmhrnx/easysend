@@ -31,10 +31,10 @@ func newSidebar(u *UI) *sidebar {
 
 func (s *sidebar) item(e navEntry, ps giode.PressState) giode.Element {
 	active := s.u.current == e.screen
-	bg, fg, ic := "transparent", "theme.muted", "theme.muted"
+	bg, border, fg, ic := "transparent", "transparent", "theme.muted", "theme.muted"
 	switch {
 	case active:
-		bg, fg, ic = colPrimarySoft, "theme.text", "theme.primary"
+		border, fg, ic = colRing, "theme.primary", "theme.primary"
 	case ps.Pressed:
 		bg, fg = colPressed, "theme.text"
 	case ps.Hovered:
@@ -50,10 +50,9 @@ func (s *sidebar) item(e navEntry, ps giode.PressState) giode.Element {
 		spacer(),
 	}
 	if n := s.u.badge(e.screen); n > 0 {
-		kids = append(kids, giode.Box(giode.Styles{BackgroundGradient: brandGradient(s.u.eng.Settings.Get(), 135), BorderRadius: 99, Padding: giode.SymmetricInset(8, 2)},
-			giode.Text(strconv.Itoa(n), giode.Styles{FontFamily: fontText, FontWeight: giode.FontWeightBold, FontSize: 11, Color: giode.Color(currentAccent(s.u.eng.Settings.Get()).Ink)})))
+		kids = append(kids, chip(strconv.Itoa(n), "theme.primary"))
 	}
-	return giode.Row(giode.Styles{Width: -1, Gap: 12, Align: giode.AlignCenter, Padding: giode.SymmetricInset(14, 11), BorderRadius: 12, Background: giode.Color(bg), Wrap: giode.WrapNoWrap}, kids...)
+	return giode.Row(giode.Styles{Width: -1, Gap: 12, Align: giode.AlignCenter, Padding: giode.SymmetricInset(14, 11), BorderRadius: 12, Background: giode.Color(bg), BorderWidth: 1, BorderColor: giode.Color(border), Wrap: giode.WrapNoWrap}, kids...)
 }
 
 func (s *sidebar) deviceCard(ps giode.PressState) giode.Element {
@@ -70,8 +69,7 @@ func (s *sidebar) deviceCard(ps giode.PressState) giode.Element {
 	return giode.Stack(giode.Styles{Width: -1, Gap: 10, Padding: giode.UniformInset(14), BorderRadius: 16, Background: giode.Color(bg)},
 		giode.Text("THIS DEVICE", stOverline),
 		giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter, Wrap: giode.WrapNoWrap},
-			giode.Box(giode.Styles{Width: 34, Height: 34, BorderRadius: 17, BackgroundGradient: avatarGradient(self.Fingerprint), Align: giode.AlignCenter, Justify: giode.JustifyCenter},
-				icon("laptop", 17, "#FFFFFF")),
+			orb("laptop", 34),
 			giode.Stack(giode.Styles{Gap: 2, FlexGrow: 1},
 				giode.Text(self.Name, giode.Styles{FontFamily: fontText, FontWeight: giode.FontWeightSemiBold, FontSize: 13.5, Color: "theme.text", MaxLines: 1, TextOverflow: giode.TextOverflowEllipsis}),
 				giode.Text(self.IP, stSmall),

@@ -1,13 +1,10 @@
 package ui
 
 import (
-	"hash/fnv"
 	"path"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/xmhrnx/giode"
 
 	"easysend/internal/item"
 	"easysend/internal/localsend"
@@ -81,20 +78,6 @@ func timeAgo(t time.Time) string {
 		return t.Format("Mon 15:04")
 	}
 	return t.Format("Jan 2")
-}
-
-// avatarPairs are gradient pairs for device avatars.
-var avatarPairs = [][2]string{
-	{"#C8963E", "#7A4E1D"}, {"#D9785A", "#86392A"}, {"#B58A4C", "#5B452A"},
-	{"#E0A458", "#9A5A2C"}, {"#A88C66", "#4E3B2A"}, {"#C47B5A", "#6E3A2E"},
-}
-
-// avatarGradient picks a stable gradient for a seed.
-func avatarGradient(seed string) *giode.LinearGradient {
-	h := fnv.New32a()
-	_, _ = h.Write([]byte(seed))
-	p := avatarPairs[int(h.Sum32())%len(avatarPairs)]
-	return giode.Linear(135, p[0], p[1])
 }
 
 func plural(n int, one, many string) string {

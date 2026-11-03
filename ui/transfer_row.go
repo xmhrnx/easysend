@@ -71,10 +71,10 @@ func (r *transferRow) savedPath() string {
 
 func (r *transferRow) Layout(gtx layout.Context) layout.Dimensions {
 	t := r.t
-	dirIcon, tint, fg := "upload", colPrimarySoft, "theme.primary"
+	dirIcon, fg := "upload", "theme.primary"
 	verb := "to "
 	if t.Direction == transfer.Incoming {
-		dirIcon, tint, fg, verb = "download", colAccentSoft, "theme.accent", "from "
+		dirIcon, fg, verb = "download", "theme.primary", "from "
 	}
 	if t.Text != "" {
 		dirIcon = "message"
@@ -111,7 +111,7 @@ func (r *transferRow) Layout(gtx layout.Context) layout.Dimensions {
 	}
 	return giode.Row(giode.Styles{Width: -1, Gap: 14, Align: giode.AlignCenter, Padding: giode.UniformInset(14), Background: "theme.surface",
 		BorderRadius: 18, BorderWidth: 1, BorderColor: "theme.border", Wrap: giode.WrapNoWrap},
-		giode.Box(giode.Styles{Align: giode.AlignStart}, tile(dirIcon, 44, tint, fg)),
+		giode.Box(giode.Styles{Align: giode.AlignStart}, tile(dirIcon, 44, fg)),
 		giode.Stack(giode.Styles{Gap: 5, FlexGrow: 1}, info...),
 		giode.Row(giode.Styles{Gap: 4, Align: giode.AlignCenter, Wrap: giode.WrapNoWrap}, actions...),
 	).Layout(gtx)

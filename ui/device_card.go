@@ -40,7 +40,7 @@ func (c *deviceCard) content(ps giode.PressState) giode.Element {
 		shadow = giode.BoxShadow{Y: 10, Blur: 30, Color: "#00000033"}
 	}
 	if ps.Pressed {
-		bg = colPrimarySoft
+		bg = colSurface2
 	}
 	if p.Favorite {
 		c.star.Icon(icon("starfilled", 18, "#FBBF24"))
@@ -54,9 +54,7 @@ func (c *deviceCard) content(ps giode.PressState) giode.Element {
 	return giode.Stack(giode.Styles{Width: 196, Gap: 12, Padding: giode.UniformInset(16), Background: giode.Color(bg), BorderRadius: 20,
 		BorderWidth: 1, BorderColor: giode.Color(border), BoxShadow: shadow, Transition: giode.StyleTransition{Duration: 120e6}},
 		giode.Row(giode.Styles{Width: -1, Align: giode.AlignStart, Wrap: giode.WrapNoWrap},
-			giode.Box(giode.Styles{Width: 52, Height: 52, BorderRadius: 26, BackgroundGradient: avatarGradient(p.Fingerprint), Align: giode.AlignCenter, Justify: giode.JustifyCenter,
-				BoxShadow: giode.BoxShadow{Y: 6, Blur: 16, Color: "#0000002A"}},
-				icon(deviceIcon(p.DeviceType), 24, "#FFFFFF")),
+			orb(deviceIcon(p.DeviceType), 52),
 			spacer(),
 			c.star,
 		),

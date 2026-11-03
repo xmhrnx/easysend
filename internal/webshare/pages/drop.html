@@ -9,10 +9,10 @@
 <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn small" id="sendText">Send message</button></div></div>
 <p class="err" id="err"></p>
 </div>
-<style>.zone{display:flex;flex-direction:column;align-items:center;gap:6px;padding:38px 16px;border-radius:20px;border:1.5px dashed rgba(200,169,107,.35);background:rgba(200,169,107,.03);cursor:pointer;text-align:center;transition:.2s}
-.zone.over{border-color:var(--brand2);background:rgba(200,169,107,.08);transform:scale(1.01)}.zone span{color:var(--muted);font-size:14px}
+<style>.zone{display:flex;flex-direction:column;align-items:center;gap:6px;padding:38px 16px;border-radius:20px;border:1px dashed var(--ring);background:transparent;cursor:pointer;text-align:center;transition:.2s}
+.zone.over{border-color:var(--brand);background:var(--orb);transform:scale(1.01)}.zone span{color:var(--muted);font-size:14px}
 .orb{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--orb);border:1px solid var(--ring);margin-bottom:8px}
-.bar{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;width:0;background:var(--grad);transition:width .2s}
+.bar{height:4px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;width:0;background:var(--brand);transition:width .2s}
 .done .bar i{background:var(--ok)}</style>
 <script>
 const base='/r/{{.Token}}',zone=document.getElementById('zone'),list=document.getElementById('list'),err=document.getElementById('err');

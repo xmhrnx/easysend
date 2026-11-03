@@ -26,9 +26,9 @@ type incomingDialog struct {
 
 func newIncomingDialog(u *UI) *incomingDialog {
 	d := &incomingDialog{u: u}
-	d.accept = u.primaryButton("Accept", "check", func() { d.answer(true) })
+	d.accept = primaryButton("Accept", "check", func() { d.answer(true) })
 	d.decline = softButton("Decline", "", func() { d.answer(false) })
-	d.trust = giode.Input.Checkbox("Always accept from this device", giode.Styles{Color: "theme.text", Background: "theme.primary"})
+	d.trust = giode.Input.Checkbox("Always accept from this device", giode.Styles{Color: "theme.text", Background: "theme.primary", BorderColor: "theme.border"})
 	d.dlg = giode.Dialog(&d.open, d.content, giode.Styles{Background: "theme.surface", BorderRadius: 26, Width: 440}).Dismissible(false)
 	return d
 }
@@ -57,14 +57,12 @@ func (d *incomingDialog) content() giode.Element {
 			break
 		}
 		files = append(files, giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter, Width: -1, Wrap: giode.WrapNoWrap},
-			tile(fileIcon(f.FileName), 32, colAccentSoft, "theme.accent"),
+			tile(fileIcon(f.FileName), 32, "theme.accent"),
 			giode.Box(giode.Styles{FlexGrow: 1}, giode.Text(f.FileName, giode.Styles{FontFamily: fontText, FontSize: 13.5, Color: "theme.text", MaxLines: 1, TextOverflow: giode.TextOverflowEllipsis})),
 			giode.Text(item.HumanSize(f.Size), stSmall)))
 	}
 	return giode.Stack(giode.Styles{Gap: 16, Width: -1, Align: giode.AlignCenter},
-		giode.Box(giode.Styles{Width: 72, Height: 72, BorderRadius: 36, BackgroundGradient: avatarGradient(r.Sender.Fingerprint), Align: giode.AlignCenter, Justify: giode.JustifyCenter,
-			BoxShadow: giode.BoxShadow{Y: 10, Blur: 26, Color: "#00000040"}},
-			icon(deviceIcon(r.Sender.DeviceType), 32, "#FFFFFF")),
+		orb(deviceIcon(r.Sender.DeviceType), 72),
 		giode.Stack(giode.Styles{Gap: 4, Align: giode.AlignCenter},
 			giode.Text(r.Sender.Alias, giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 22, Color: "theme.text"}),
 			giode.Text("wants to send you "+plural(len(r.Files), "file", "files")+" · "+item.HumanSize(r.Total), stMuted)),

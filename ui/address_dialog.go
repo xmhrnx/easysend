@@ -25,7 +25,7 @@ func newAddressDialog(u *UI) *addressDialog {
 	d := &addressDialog{u: u}
 	d.addr = giode.Input.Text("192.168.1.20 or 192.168.1.20:53317", giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 12, Color: "theme.text"}).
 		Keyboard(giode.KeyboardURL).Submit(func(string) { d.submit() })
-	d.add = u.primaryButton("Connect", "plus", d.submit)
+	d.add = primaryButton("Connect", "plus", d.submit)
 	d.cancel = softButton("Cancel", "", func() { d.isOpen = false })
 	d.dlg = giode.Dialog(&d.isOpen, d.content, giode.Styles{Background: "theme.surface", BorderRadius: 26, Width: 440})
 	return d

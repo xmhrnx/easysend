@@ -1,43 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2A231A"/>
-      <stop offset="0.55" stop-color="#16120D"/>
-      <stop offset="1" stop-color="#0B0907"/>
+      <stop offset="0" stop-color="#1D1915"/>
+      <stop offset="1" stop-color="#0B0A08"/>
     </linearGradient>
-    <radialGradient id="glow" cx="0.68" cy="0.32" r="0.6">
-      <stop offset="0" stop-color="#D6B87C" stop-opacity="0.18"/>
-      <stop offset="1" stop-color="#E9B949" stop-opacity="0"/>
-    </radialGradient>
     <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#E3CC9C" stop-opacity="0.65"/>
-      <stop offset="0.5" stop-color="#A88A52" stop-opacity="0.15"/>
-      <stop offset="1" stop-color="#E3CC9C" stop-opacity="0.45"/>
+      <stop offset="0" stop-color="#E0C894" stop-opacity="0.55"/>
+      <stop offset="0.5" stop-color="#A88A52" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#E0C894" stop-opacity="0.4"/>
     </linearGradient>
-    <linearGradient id="plane" x1="0.2" y1="0" x2="0.8" y2="1">
-      <stop offset="0" stop-color="#F4E6C6"/>
-      <stop offset="0.45" stop-color="#D6B87C"/>
-      <stop offset="1" stop-color="#977645"/>
+    <linearGradient id="gold" gradientUnits="userSpaceOnUse" x1="300" y1="280" x2="740" y2="740">
+      <stop offset="0" stop-color="#EAD6A8"/>
+      <stop offset="0.55" stop-color="#C8A96B"/>
+      <stop offset="1" stop-color="#9C7E48"/>
     </linearGradient>
-    <linearGradient id="fold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#B29560"/>
-      <stop offset="1" stop-color="#6E5634"/>
-    </linearGradient>
-    <linearGradient id="arc" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#E0C894"/>
-      <stop offset="1" stop-color="#A88A52"/>
-    </linearGradient>
-    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#000000" flood-opacity="0.55"/>
-    </filter>
-  </defs><g transform="translate(512 512) scale(0.62) translate(-505 -540)"><!-- signal arcs: nearby + internet -->
-  <g fill="none" stroke="url(#arc)" stroke-linecap="round">
-    <path d="M250 640 A 190 190 0 0 0 384 774" stroke-width="34" stroke-opacity="0.85"/>
-    <path d="M170 650 A 270 270 0 0 0 374 854" stroke-width="34" stroke-opacity="0.45"/>
-  </g>
-  <!-- paper plane -->
-  <g filter="url(#shadow)">
-    <path d="M232 488 L760 250 C786 238 812 262 800 288 L566 812 C554 838 516 836 508 808 L452 600 Z" fill="url(#plane)"/>
-    <path d="M452 600 L800 288 L522 796 Z" fill="url(#fold)" opacity="0.75"/>
-    <path d="M232 488 L452 600 L800 288 Z" fill="#F7EEDA" opacity="0.9"/>
+  </defs><g transform="translate(512 512) scale(0.72) translate(-521 -512)"><g id="mark" fill="none" stroke="url(#gold)" stroke-width="58" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M610 300 H392 Q330 300 330 362 V662 Q330 724 392 724 H610"/>
+    <path d="M330 512 H712"/>
+    <path d="M626 426 L712 512 L626 598"/>
   </g>
 </g></svg>
