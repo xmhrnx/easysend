@@ -7,29 +7,10 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"sync"
 
 	"easysend/internal/item"
 	"easysend/internal/transfer"
 )
-
-type uploadBatch struct {
-	id      string
-	files   []transfer.File
-	pending map[int]bool
-	renames map[string]string
-	dir     string
-	mu      sync.Mutex
-}
-
-func (s *Server) dropAllowed(w http.ResponseWriter, r *http.Request) bool {
-	token := r.PathValue("token")
-	if !s.cfg.DropEnabled() || token != s.cfg.DropToken() {
-		s.gone(w)
-		return false
-	}
-	return true
-}
 
 func (s *Server) handleDrop(w http.ResponseWriter, r *http.Request) {
 	if !s.dropAllowed(w, r) {
@@ -41,13 +22,6 @@ func (s *Server) handleDrop(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.render(w, "drop", pageData{Device: s.cfg.Device(), Token: token})
-}
-
-type beginRequest struct {
-	Files []struct {
-		Name string `json:"name"`
-		Size int64  `json:"size"`
-	} `json:"files"`
 }
 
 func (s *Server) handleBegin(w http.ResponseWriter, r *http.Request) {
@@ -70,14 +44,6 @@ func (s *Server) handleBegin(w http.ResponseWriter, r *http.Request) {
 	s.mu.Unlock()
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(map[string]string{"batch": b.id})
-}
-
-func (s *Server) dropUnlocked(w http.ResponseWriter, r *http.Request) bool {
-	if !unlocked(r, r.PathValue("token"), s.cfg.DropPIN()) {
-		http.Error(w, "PIN required", http.StatusUnauthorized)
-		return false
-	}
-	return true
 }
 
 func (s *Server) handleUpload(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,3 @@
+package webshare
+
+const logoSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B1B1E"/><stop offset="1" stop-color="#0A0A0B"/></linearGradient><radialGradient id="d" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#EAD6A8"/><stop offset="1" stop-color="#B8975A"/></radialGradient></defs><rect width="64" height="64" rx="16" fill="url(#b)"/><g fill="none" stroke="#C8A96B"><circle cx="32" cy="32" r="10.5" stroke-width="1.6"/><circle cx="32" cy="32" r="17" stroke-width="1.3" stroke-opacity=".6"/><circle cx="32" cy="32" r="23.5" stroke-width="1" stroke-opacity=".32"/></g><circle cx="32" cy="32" r="5" fill="url(#d)"/></svg>`

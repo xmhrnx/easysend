@@ -11,8 +11,6 @@ import (
 	"easysend/internal/settings"
 )
 
-const requestFilesShown = 4
-
 // incomingDialog asks whether to accept a nearby transfer.
 type incomingDialog struct {
 	u       *UI
@@ -23,6 +21,8 @@ type incomingDialog struct {
 	decline *giode.ButtonElement
 	trust   *checkbox.Checkbox
 }
+
+const requestFilesShown = 4
 
 func newIncomingDialog(u *UI) *incomingDialog {
 	d := &incomingDialog{u: u}

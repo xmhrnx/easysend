@@ -5,57 +5,15 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
-	"strconv"
-	"sync"
 	"time"
 
 	"easysend/internal/localsend"
-	"easysend/internal/natmap"
-	"easysend/internal/netutil"
 	"easysend/internal/settings"
 	"easysend/internal/transfer"
 	"easysend/internal/webshare"
 )
-
-// Config sets up the engine.
-type Config struct {
-	// DataDir holds settings, history and the TLS certificate.
-	DataDir string
-	// DownloadDir is the default folder for received files.
-	DownloadDir string
-	// DeviceModel ("MacBook Pro", "Pixel 8") and DeviceType
-	// (localsend.TypeDesktop or TypeMobile) describe this device.
-	DeviceModel string
-	DeviceType  string
-	// OnChange runs on any goroutine whenever state the UI shows changed.
-	OnChange func()
-	// Notify shows a system notification.
-	Notify func(title, body string)
-	// Publish, when set, moves a received file from DownloadDir to where
-	// the user finds it (Android's Downloads) and returns its new
-	// location. The original is removed once it succeeds.
-	Publish func(ctx context.Context, path string) (string, error)
-}
-
-// Engine is the running app core.
-type Engine struct {
-	cfg       Config
-	Settings  *settings.Store
-	Transfers *transfer.Registry
-
-	node *localsend.Node
-	web  *webshare.Server
-
-	mu       sync.Mutex
-	requests []*Request
-	public   PublicStatus
-	mapping  *natmap.Mapping
-	scanning bool
-	stopNAT  context.CancelFunc
-}
 
 // Start loads the settings and starts every service.
 func Start(cfg Config) (*Engine, error) {
@@ -153,95 +111,4 @@ func (e *Engine) receivePIN() string {
 		return s.PIN
 	}
 	return ""
-}
-
-// Self describes this device for the UI.
-type Self struct {
-	Name, IP, Model string
-	Port, WebPort   int
-	Fingerprint     string
-}
-
-// Self returns this device's name and addresses.
-func (e *Engine) Self() Self {
-	info := e.node.Self()
-	return Self{Name: info.Alias, IP: netutil.PrimaryIPv4(), Model: e.cfg.DeviceModel, Port: e.node.Port(), WebPort: e.web.Port(), Fingerprint: info.Fingerprint}
-}
-
-// UpdateSettings changes the settings and applies what changed.
-func (e *Engine) UpdateSettings(fn func(*settings.Settings)) error {
-	before := e.Settings.Get()
-	err := e.Settings.Update(fn)
-	after := e.Settings.Get()
-	if before.UPnP != after.UPnP {
-		e.applyPublic()
-	}
-	if before.DeviceName != after.DeviceName || (!before.Discoverable && after.Discoverable) {
-		go e.node.Refresh(context.Background())
-	}
-	e.changed()
-	return err
-}
-
-// LANBase is the browser address of this device on the local network.
-func (e *Engine) LANBase() string {
-	ip := netutil.PrimaryIPv4()
-	if ip == "" {
-		ip = "localhost"
-	}
-	return "http://" + ip + ":" + strconv.Itoa(e.web.Port())
-}
-
-// OtherLANBases are browser addresses on this device's other local
-// addresses (a second adapter), for when the first doesn't open.
-func (e *Engine) OtherLANBases() []string {
-	ips := netutil.LocalIPv4()
-	var out []string
-	for i, ip := range ips {
-		if i == 0 {
-			continue
-		}
-		out = append(out, "http://"+ip.String()+":"+strconv.Itoa(e.web.Port()))
-		if len(out) == 2 {
-			break
-		}
-	}
-	return out
-}
-
-// PublicBase is the internet address of the browser pages, or "".
-func (e *Engine) PublicBase() string {
-	if u := e.Settings.Get().PublicURL; u != "" {
-		return trimSlash(u)
-	}
-	e.mu.Lock()
-	defer e.mu.Unlock()
-	if e.public.State == PublicReady {
-		return "http://" + e.public.IP + ":" + strconv.Itoa(e.public.Port)
-	}
-	return ""
-}
-
-func trimSlash(s string) string {
-	for len(s) > 0 && s[len(s)-1] == '/' {
-		s = s[:len(s)-1]
-	}
-	return s
-}
-
-// errorText turns errors into short messages for people.
-func errorText(err error) string {
-	switch {
-	case err == nil:
-		return ""
-	case errors.Is(err, localsend.ErrPINRequired):
-		return "PIN required"
-	case errors.Is(err, localsend.ErrDeclined):
-		return "Declined by the receiver"
-	case errors.Is(err, localsend.ErrBusy):
-		return "The receiver is busy"
-	case errors.Is(err, context.DeadlineExceeded):
-		return "Timed out"
-	}
-	return err.Error()
 }

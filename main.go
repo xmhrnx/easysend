@@ -4,14 +4,11 @@
 package main
 
 import (
-	"context"
 	"image"
 	"log"
 	"net/url"
-	"sync"
 
 	"github.com/xmhrnx/giode"
-	"github.com/xmhrnx/giode/multicast"
 
 	"easysend/assets"
 	"easysend/internal/engine"
@@ -112,67 +109,4 @@ func main() {
 	if err := app.Run(func() giode.Element { return u.View() }); err != nil {
 		log.Fatal(err)
 	}
-}
-
-// publisher moves received files to the system Downloads where the
-// platform keeps them apart from the app (Android).
-func publisher(app *giode.App) func(context.Context, string) (string, error) {
-	if !platform.ReceivesToDownloads {
-		return nil
-	}
-	return func(ctx context.Context, path string) (string, error) {
-		return app.SaveToDownloads(ctx, path, "EasySend")
-	}
-}
-
-// multicastLock lets Android deliver the multicast packets nearby
-// discovery listens for, while the app is on screen (it costs battery).
-// Elsewhere it does nothing.
-type multicastLock struct {
-	mu      sync.Mutex
-	release func()
-}
-
-func (m *multicastLock) start() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if m.release != nil {
-		return
-	}
-	release, err := multicast.Acquire("EasySend discovery")
-	if err != nil {
-		log.Printf("multicast: %v", err)
-		return
-	}
-	m.release = release
-}
-
-func (m *multicastLock) stop() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if m.release != nil {
-		m.release()
-		m.release = nil
-	}
-}
-
-// deviceModel names the hardware for other devices' lists.
-func deviceModel() string {
-	d := giode.Device()
-	if d.Model != "" {
-		return d.Model
-	}
-	switch d.OS {
-	case "darwin":
-		return "Mac"
-	case "windows":
-		return "Windows PC"
-	case "linux":
-		return "Linux PC"
-	case "android":
-		return "Android"
-	case "ios":
-		return "iPhone"
-	}
-	return "Computer"
 }

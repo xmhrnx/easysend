@@ -13,16 +13,6 @@ import (
 	"easysend/internal/item"
 )
 
-var expiryChoices = []struct {
-	label string
-	d     time.Duration
-}{{"1 hour", time.Hour}, {"24 hours", 24 * time.Hour}, {"7 days", 7 * 24 * time.Hour}, {"Never", 0}}
-
-var limitChoices = []struct {
-	label string
-	n     int
-}{{"Unlimited", 0}, {"1 download", 1}, {"5 downloads", 5}, {"10 downloads", 10}}
-
 // linkPanel shares through a link and QR code anyone can open in a
 // browser, without the app.
 type linkPanel struct {
@@ -33,6 +23,16 @@ type linkPanel struct {
 	pin    *input.Input
 	create *giode.ButtonElement
 }
+
+var expiryChoices = []struct {
+	label string
+	d     time.Duration
+}{{"1 hour", time.Hour}, {"24 hours", 24 * time.Hour}, {"7 days", 7 * 24 * time.Hour}, {"Never", 0}}
+
+var limitChoices = []struct {
+	label string
+	n     int
+}{{"Unlimited", 0}, {"1 download", 1}, {"5 downloads", 5}, {"10 downloads", 10}}
 
 func newLinkPanel(u *UI) *linkPanel {
 	p := &linkPanel{u: u}
