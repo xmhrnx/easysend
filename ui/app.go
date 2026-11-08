@@ -163,10 +163,7 @@ func (u *UI) addItems(its []item.Item) {
 	}
 	u.items = append(u.items, its...)
 	u.current = screenSend
-	// Files from the file manager's menu, "Open with" or the share sheet
-	// arrive while the window may be hidden in the tray or behind others.
 	u.app.ShowWindow()
-	u.app.Raise()
 }
 
 func (u *UI) removeItem(id string) {
