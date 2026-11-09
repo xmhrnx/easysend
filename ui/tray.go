@@ -35,7 +35,7 @@ func (u *UI) refreshTrayMenu() {
 			u.app.ShowWindow()
 		}
 	}
-	u.app.Tray().SetMenu(
+	items := []giode.TrayItem{
 		giode.TrayAction("Open EasySend", u.app.ShowWindow),
 		giode.TraySeparator(),
 		giode.TrayAction("Send files…", func() {
@@ -58,6 +58,27 @@ func (u *UI) refreshTrayMenu() {
 			u.refreshTrayMenu()
 		}),
 		giode.TraySeparator(),
-		giode.TrayAction("Quit EasySend", u.app.Quit),
-	)
+	}
+	items = append(items, supportItems(u)...)
+	items = append(items, giode.TraySeparator(), giode.TrayAction("Quit EasySend", u.app.Quit))
+	u.app.Tray().SetMenu(items...)
+}
+
+// supportItems are the tray's report and donate entries, where they apply.
+func supportItems(u *UI) []giode.TrayItem {
+	var items []giode.TrayItem
+	open := func(fn func()) func() {
+		return func() {
+			u.Go(screenSettings)
+			u.app.ShowWindow()
+			fn()
+		}
+	}
+	if canReport() {
+		items = append(items, giode.TrayAction("Report a problem…", open(u.help.Report)))
+	}
+	if u.help.CanDonate() {
+		items = append(items, giode.TrayAction("Support EasySend…", u.help.Donate))
+	}
+	return items
 }

@@ -98,6 +98,22 @@ assets/              icon (SVG sources + PNGs), Android icon layers, Inter font
 
 Inter is © The Inter Project Authors, under the SIL Open Font License (assets/fonts).
 
+## Help & support
+
+Settings has a **Help & support** card (and the desktop tray menu has the same entries),
+built on Giode's `support` package. The settings live in `ui/support.go`.
+
+- **Report a problem** opens a form whose reports become issues in xmhrnx/easysend,
+  through Giode's support relay (a Cloudflare Worker, `support/relay` in the Giode
+  repository), so users need no GitHub account. Deploy it once, map `"easysend"` to
+  `"xmhrnx/easysend"` in its `APPS`, and put its address (ending in `/report`) in
+  `reportURL`. Until then the button stays hidden. Reports can include the last crash,
+  which `crash.Init` in `main.go` records.
+- **Donate** opens <https://ko-fi.com/xmhrnx> on direct downloads, Linux and the
+  Microsoft Store. Where the store requires its own payments (iOS, the Mac App Store,
+  Google Play) it offers tips as in-app purchases instead: create **consumable** products
+  `tip_coffee`, `tip_lunch` and `tip_dinner` in App Store Connect and the Play Console.
+
 ## Releases
 
 `.github/workflows/release.yml` (written by `giode ci` from the `[ci]` section of

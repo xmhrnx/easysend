@@ -65,6 +65,7 @@ func (s *settingsScreen) content() giode.Element {
 			settingBlock("Rendezvous server", "Leave empty for the public Magic Wormhole server.", s.rendezvous, 260),
 			settingBlock("Transit relay", "Used only when a direct connection isn't possible.", s.relay, 260),
 		),
+		s.supportCard(),
 		settingsCard("About", "info",
 			settingRow("EasySend "+version(), "Nearby transfers speak the open LocalSend protocol; internet transfers speak Magic Wormhole. Both are end-to-end encrypted.", giode.Box(giode.Styles{})),
 		),

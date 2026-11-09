@@ -16,6 +16,8 @@ type settingsScreen struct {
 	u      *UI
 	scroll *scroll.Scroll
 
+	report, donate *giode.ButtonElement
+
 	name   *input.Input
 	theme  *segmented.Control
 	accent *accentPicker
@@ -102,6 +104,8 @@ func newSettingsScreen(u *UI) *settingsScreen {
 	s.rendezvous = field("Default (relay.magic-wormhole.io)", cur.RendezvousURL, func(v string) { update(func(st *settings.Settings) { st.RendezvousURL = v }) })
 	s.relay = field("Default (transit.magic-wormhole.io)", cur.TransitRelay, func(v string) { update(func(st *settings.Settings) { st.TransitRelay = v }) })
 
+	s.report = softButton("Report…", "report", u.help.Report)
+	s.donate = primaryButton("Donate", "heart", u.help.Donate)
 	s.scroll = giode.Scroll(s.content, scrollStyles)
 	return s
 }

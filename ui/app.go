@@ -7,6 +7,7 @@ import (
 	_ "image/png" // logo decoding
 
 	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/support"
 
 	"easysend/assets"
 	"easysend/internal/engine"
@@ -47,6 +48,7 @@ type UI struct {
 	compose  *composeDialog
 	address  *addressDialog
 	toasts   *giode.ToasterElement
+	help     *support.Support // report form, donations
 }
 
 // New builds the interface for a running engine.
@@ -56,6 +58,7 @@ func New(app *giode.App, eng *engine.Engine) *UI {
 		u.logo = img
 	}
 	u.toasts = giode.Toaster().Placement(giode.ToastBottomCenter).Max(3)
+	u.help = newSupport(u)
 	if platform.IsDesktop {
 		u.frame = newWindowFrame(u)
 	}
@@ -85,7 +88,7 @@ func (u *UI) ApplyTheme() {
 // View is the root view, run every frame.
 func (u *UI) View() giode.Element {
 	page := u.page()
-	overlays := []giode.Element{u.incoming, u.pin, u.compose, u.address, u.toasts}
+	overlays := []giode.Element{u.incoming, u.pin, u.compose, u.address, u.help, u.toasts}
 	body := giode.Responsive(
 		giode.Breakpoint{MaxWidth: 760, Name: "compact", View: func() giode.Element {
 			return giode.Stack(giode.Styles{Width: -1, Height: -1, Background: "theme.background"},
