@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"easysend/internal/diag"
 )
 
 // Config sets up a Node.
@@ -67,19 +69,26 @@ func Start(cfg Config) (*Node, error) {
 	}
 	ln, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	if err != nil {
+		diag.Logf("nearby: TCP port %d unavailable (%v); using another", port, err)
 		ln, err = net.Listen("tcp", ":0")
 		if err != nil {
+			diag.Logf("nearby: no TCP port: %v", err)
 			return nil, err
 		}
 	}
 	n.port = ln.Addr().(*net.TCPAddr).Port
+	diag.Logf("nearby: listening on TCP %d (%s)", n.port, n.protocol)
 	if cfg.Cert != nil {
 		ln = tls.NewListener(ln, &tls.Config{Certificates: []tls.Certificate{*cfg.Cert}, MinVersion: tls.VersionTLS12})
 	}
 	n.ln = ln
 	n.client = newClient()
 	n.srv = &http.Server{Handler: n.routes(), ReadHeaderTimeout: 15 * time.Second}
-	go func() { _ = n.srv.Serve(ln) }()
+	go func() {
+		if err := n.srv.Serve(ln); err != nil && err != http.ErrServerClosed {
+			diag.Logf("nearby: server stopped: %v", err)
+		}
+	}()
 	n.disc = startDiscovery(n)
 	return n, nil
 }

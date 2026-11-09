@@ -1,6 +1,11 @@
 package webshare
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+
+	"easysend/internal/diag"
+)
 
 func (s *Server) routes() http.Handler {
 	mux := http.NewServeMux()
@@ -27,6 +32,16 @@ func securityHeaders(h http.Handler) http.Handler {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "no-referrer")
 		w.Header().Set("X-Frame-Options", "DENY")
+		diag.Logf("browser: %s %s from %s", r.Method, redact(r.URL.Path), r.RemoteAddr)
 		h.ServeHTTP(w, r)
 	})
+}
+
+// redact keeps a request path's kind (/s/, /r/) without its secret token.
+func redact(path string) string {
+	parts := strings.SplitN(strings.TrimPrefix(path, "/"), "/", 3)
+	if len(parts) >= 2 && (parts[0] == "s" || parts[0] == "r") {
+		return "/" + parts[0] + "/…"
+	}
+	return path
 }

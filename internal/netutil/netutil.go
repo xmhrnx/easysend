@@ -2,8 +2,10 @@
 package netutil
 
 import (
+	"fmt"
 	"net"
 	"sort"
+	"strings"
 )
 
 // virtualNames are parts of the names of adapters other devices on the
@@ -133,4 +135,42 @@ func IsLocal(ip net.IP) bool {
 		}
 	}
 	return false
+}
+
+// Describe lists every network adapter with its state and addresses, and
+// how EasySend ranks it, for problem reports.
+func Describe() string {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "adapters: " + err.Error() + "; routed address: " + fmt.Sprint(routeIPv4())
+	}
+	route := routeIPv4()
+	var b strings.Builder
+	fmt.Fprintf(&b, "routed address: %v\n", route)
+	for _, ifc := range ifaces {
+		addrs, _ := ifc.Addrs()
+		var list []string
+		for _, a := range addrs {
+			list = append(list, a.String())
+		}
+		state := "down"
+		if ifc.Flags&net.FlagUp != 0 {
+			state = "up"
+		}
+		if ifc.Flags&net.FlagMulticast != 0 {
+			state += ",multicast"
+		}
+		if ifc.Flags&net.FlagLoopback != 0 {
+			state += ",loopback"
+		}
+		rank := ""
+		for _, a := range addrs {
+			if ipn, ok := a.(*net.IPNet); ok && ipn.IP.To4() != nil {
+				rank = fmt.Sprintf(" score=%d", score(ifc.Name, ipn.IP.To4(), route))
+				break
+			}
+		}
+		fmt.Fprintf(&b, "%q [%s]%s %s\n", ifc.Name, state, rank, strings.Join(list, " "))
+	}
+	return b.String()
 }

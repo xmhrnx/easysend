@@ -9,7 +9,9 @@ import (
 	"os"
 	"time"
 
+	"easysend/internal/diag"
 	"easysend/internal/localsend"
+	"easysend/internal/netutil"
 	"easysend/internal/settings"
 	"easysend/internal/transfer"
 	"easysend/internal/webshare"
@@ -62,6 +64,8 @@ func Start(cfg Config) (*Engine, error) {
 		return nil, fmt.Errorf("browser sharing: %w", err)
 	}
 	e.applyPublic()
+	diag.Logf("adapters:\n%s", netutil.Describe())
+	diag.Logf("links use %s; nearby port %d, browser port %d", e.LANBase(), e.node.Port(), e.web.Port())
 	go func() {
 		time.Sleep(1500 * time.Millisecond)
 		if len(e.node.Devices()) == 0 {
