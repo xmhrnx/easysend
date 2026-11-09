@@ -65,6 +65,7 @@ publisher_display_name = "Mehran Zahir"
 startup_task = true
 
 [linux]
+app_id = "io.github.xmhrnx.EasySend"   # Flathub's ID (app.id needs a domain we don't own); Linux only
 maintainer = "Mehran <xmhrnx@users.noreply.github.com>"   # .deb/.rpm metadata
 categories = ["Network", "FileTransfer", "Utility"]
 description = "EasySend sends files, folders and text between devices: nearby with discovery (compatible with LocalSend), anywhere over the internet with a short code (compatible with Magic Wormhole), and to anyone with a browser through a link or QR code."
@@ -83,6 +84,14 @@ flatpak_permissions = [
   "--talk-name=org.freedesktop.Notifications",
   "--filesystem=xdg-config/autostart:create",
 ]
+screenshots = [
+  { url = "https://raw.githubusercontent.com/xmhrnx/easysend/main/docs/screenshots/send.png", caption = "Send files nearby, over the internet or with a link" },
+  { url = "https://raw.githubusercontent.com/xmhrnx/easysend/main/docs/screenshots/receive.png", caption = "Receive from nearby devices, a code or any browser" },
+]
+
+[linux.snap]                     # registered on snapcraft.io; adds the release workflow's snap job
+name = "easysend"
+plugs = ["desktop", "desktop-legacy", "wayland", "x11", "opengl", "network", "network-bind", "home"]
 
 [[context_actions]]
 id = "send"
