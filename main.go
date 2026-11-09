@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/crash"
 
 	"easysend/assets"
 	"easysend/internal/engine"
@@ -18,6 +19,9 @@ import (
 )
 
 func main() {
+	if err := crash.Init(crash.Options{Version: giode.AppVersion}); err != nil {
+		log.Printf("crash reports: %v", err)
+	}
 	if err := ui.LoadFonts(); err != nil {
 		log.Fatal(err)
 	}
