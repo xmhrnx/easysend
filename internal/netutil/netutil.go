@@ -19,14 +19,25 @@ var virtualNames = []string{
 // the adapter that carries the default route, unless that's a VPN or
 // virtual adapter, then Wi-Fi and Ethernet before anything virtual.
 func LocalIPv4() []net.IP {
+	nets := LocalNets()
+	out := make([]net.IP, len(nets))
+	for i, n := range nets {
+		out[i] = n.IP
+	}
+	return out
+}
+
+// LocalNets is LocalIPv4 with each address's network (its subnet mask),
+// for scanning the network. Where the system doesn't say (Android 11+
+// denies apps the interface list) the network is assumed to be a /24.
+func LocalNets() []net.IPNet {
 	route := routeIPv4()
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		// Android 11+ denies apps the interface list.
-		return route
+		return assumed24(route)
 	}
 	type cand struct {
-		ip    net.IP
+		net   net.IPNet
 		score int
 	}
 	var cands []cand
@@ -47,21 +58,62 @@ func LocalIPv4() []net.IP {
 			if ip == nil || ip.IsLinkLocalUnicast() || !ip.IsPrivate() {
 				continue
 			}
-			cands = append(cands, cand{ip, score(ifc.Name, ip, route)})
+			mask := ipn.Mask
+			if len(mask) == net.IPv6len {
+				mask = mask[12:]
+			}
+			cands = append(cands, cand{net.IPNet{IP: ip, Mask: mask}, score(ifc.Name, ip, route)})
 		}
 	}
 	if len(cands) == 0 {
-		return route
+		return assumed24(route)
 	}
 	sort.SliceStable(cands, func(i, j int) bool { return cands[i].score > cands[j].score })
-	out := make([]net.IP, len(cands))
+	out := make([]net.IPNet, len(cands))
 	for i, c := range cands {
-		out[i] = c.ip
+		out[i] = c.net
 	}
 	return out
 }
 
-// PrimaryIPv4 returns the most likely LAN address, or "".
+func assumed24(ips []net.IP) []net.IPNet {
+	out := make([]net.IPNet, len(ips))
+	for i, ip := range ips {
+		out[i] = net.IPNet{IP: ip, Mask: net.CIDRMask(24, 32)}
+	}
+	return out
+}
+
+// ScanRange is the block of addresses to look for devices in around n:
+// its whole subnet, but at most a /22 (1022 hosts) around n.IP, so a
+// large network still scans in seconds.
+func ScanRange(n net.IPNet) net.IPNet {
+	ones, bits := n.Mask.Size()
+	if bits != 32 || ones < 22 {
+		ones = 22
+	}
+	if ones > 30 {
+		ones = 30
+	}
+	mask := net.CIDRMask(ones, 32)
+	return net.IPNet{IP: n.IP.Mask(mask), Mask: mask}
+}
+
+// Hosts lists the usable addresses of a block, without its network and
+// broadcast addresses.
+func Hosts(n net.IPNet) []net.IP {
+	base := n.IP.To4()
+	ones, _ := n.Mask.Size()
+	count := uint32(1) << (32 - ones)
+	start := uint32(base[0])<<24 | uint32(base[1])<<16 | uint32(base[2])<<8 | uint32(base[3])
+	out := make([]net.IP, 0, count)
+	for i := uint32(1); i+1 < count; i++ {
+		v := start + i
+		out = append(out, net.IPv4(byte(v>>24), byte(v>>16), byte(v>>8), byte(v)).To4())
+	}
+	return out
+}
+
 func PrimaryIPv4() string {
 	ips := LocalIPv4()
 	if len(ips) == 0 {

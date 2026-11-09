@@ -21,15 +21,14 @@ func (n *Node) scan(ctx context.Context) {
 	sem := make(chan struct{}, 64)
 	var wg sync.WaitGroup
 	seen := map[string]bool{}
-	for _, ip := range netutil.LocalIPv4() {
-		base := ip.Mask(net.CIDRMask(24, 32))
-		if seen[base.String()] || !ip.IsPrivate() {
+	for _, local := range netutil.LocalNets() {
+		block := netutil.ScanRange(local)
+		if seen[block.String()] {
 			continue
 		}
-		seen[base.String()] = true
-		for h := 1; h < 255; h++ {
-			target := net.IPv4(base[0], base[1], base[2], byte(h))
-			if target.Equal(ip) {
+		seen[block.String()] = true
+		for _, target := range netutil.Hosts(block) {
+			if target.Equal(local.IP) {
 				continue
 			}
 			select {
