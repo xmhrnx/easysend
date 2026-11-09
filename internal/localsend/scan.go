@@ -5,8 +5,10 @@ import (
 	"net"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
+	"easysend/internal/diag"
 	"easysend/internal/netutil"
 )
 
@@ -21,15 +23,20 @@ func (n *Node) scan(ctx context.Context) {
 	sem := make(chan struct{}, 64)
 	var wg sync.WaitGroup
 	seen := map[string]bool{}
-	for _, ip := range netutil.LocalIPv4() {
-		base := ip.Mask(net.CIDRMask(24, 32))
-		if seen[base.String()] || !ip.IsPrivate() {
+	start := time.Now()
+	var open, found atomic.Int32
+	defer func() {
+		diag.Logf("scan: done in %s: %d open on port %d, %d added", time.Since(start).Round(time.Millisecond), open.Load(), DefaultPort, found.Load())
+	}()
+	for _, local := range netutil.LocalNets() {
+		block := netutil.ScanRange(local)
+		if seen[block.String()] {
 			continue
 		}
-		seen[base.String()] = true
-		for h := 1; h < 255; h++ {
-			target := net.IPv4(base[0], base[1], base[2], byte(h))
-			if target.Equal(ip) {
+		seen[block.String()] = true
+		diag.Logf("scan: %s (this device %s)", block.String(), local.IP)
+		for _, target := range netutil.Hosts(block) {
+			if target.Equal(local.IP) {
 				continue
 			}
 			select {
@@ -45,9 +52,15 @@ func (n *Node) scan(ctx context.Context) {
 				if !portOpen(ctx, addr) {
 					return
 				}
+				open.Add(1)
 				c, cancel := context.WithTimeout(ctx, 3*time.Second)
 				defer cancel()
-				_, _ = n.Register(c, addr, false)
+				if d, err := n.Register(c, addr, false); err != nil {
+					diag.Logf("scan: %s is open but didn't identify: %v", addr, err)
+				} else {
+					found.Add(1)
+					diag.Logf("scan: found %q at %s", d.Alias, d.Addr())
+				}
 			}(net.JoinHostPort(target.String(), strconv.Itoa(DefaultPort)))
 		}
 	}

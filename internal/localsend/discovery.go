@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"golang.org/x/net/ipv4"
+
+	"easysend/internal/diag"
 )
 
 type discovery struct {
@@ -19,6 +21,7 @@ type discovery struct {
 	ifaces []net.Interface
 	stop   chan struct{}
 	once   sync.Once
+	logged sync.Map // keys of lines logged once
 }
 
 func startDiscovery(n *Node) *discovery {
@@ -26,29 +29,47 @@ func startDiscovery(n *Node) *discovery {
 	lc := net.ListenConfig{Control: reuse}
 	conn, err := lc.ListenPacket(context.Background(), "udp4", ":"+strconv.Itoa(DefaultPort))
 	if err != nil {
-		// Without the multicast port we can still announce and scan.
+		// Without the multicast port we can still announce and scan, but
+		// won't hear other devices' announcements.
+		diag.Logf("discovery: UDP port %d unavailable (%v): won't hear announcements", DefaultPort, err)
 		conn, err = net.ListenPacket("udp4", ":0")
 		if err != nil {
+			diag.Logf("discovery: no UDP socket: %v", err)
 			return d
 		}
+	} else {
+		diag.Logf("discovery: listening on UDP %d", DefaultPort)
 	}
 	d.conn = conn
 	d.pc = ipv4.NewPacketConn(conn)
 	_ = d.pc.SetMulticastLoopback(true)
 	_ = d.pc.SetMulticastTTL(4)
-	if ifs, err := net.Interfaces(); err == nil {
-		for _, ifc := range ifs {
-			if ifc.Flags&net.FlagUp == 0 || ifc.Flags&net.FlagMulticast == 0 {
-				continue
-			}
-			if err := d.pc.JoinGroup(&ifc, d.group); err == nil {
-				d.ifaces = append(d.ifaces, ifc)
-			}
+	ifs, err := net.Interfaces()
+	if err != nil {
+		diag.Logf("discovery: can't list adapters (%v): announcing on the default one", err)
+	}
+	for _, ifc := range ifs {
+		if ifc.Flags&net.FlagUp == 0 || ifc.Flags&net.FlagMulticast == 0 {
+			continue
 		}
+		if err := d.pc.JoinGroup(&ifc, d.group); err != nil {
+			diag.Logf("discovery: %q can't join multicast: %v", ifc.Name, err)
+			continue
+		}
+		d.ifaces = append(d.ifaces, ifc)
+		diag.Logf("discovery: joined multicast on %q", ifc.Name)
 	}
 	go d.listen()
 	go d.loop()
 	return d
+}
+
+// logOnce records a line the first time key comes up, so repeating
+// events (every announcement) don't fill the log.
+func (d *discovery) logOnce(key, format string, args ...any) {
+	if _, seen := d.logged.LoadOrStore(key, true); !seen {
+		diag.Logf(format, args...)
+	}
 }
 
 func (d *discovery) close() {
@@ -91,14 +112,19 @@ func (d *discovery) announce(isAnnounce bool) {
 		return
 	}
 	if len(d.ifaces) == 0 {
-		_, _ = d.pc.WriteTo(data, nil, d.group)
+		if _, err := d.pc.WriteTo(data, nil, d.group); err != nil {
+			d.logOnce("announce", "discovery: announcing failed: %v", err)
+		}
 		return
 	}
 	for i := range d.ifaces {
 		if err := d.pc.SetMulticastInterface(&d.ifaces[i]); err != nil {
+			d.logOnce("if-"+d.ifaces[i].Name, "discovery: can't announce on %q: %v", d.ifaces[i].Name, err)
 			continue
 		}
-		_, _ = d.pc.WriteTo(data, nil, d.group)
+		if _, err := d.pc.WriteTo(data, nil, d.group); err != nil {
+			d.logOnce("send-"+d.ifaces[i].Name, "discovery: announcing on %q failed: %v", d.ifaces[i].Name, err)
+		}
 	}
 }
 
@@ -124,6 +150,7 @@ func (d *discovery) listen() {
 			continue
 		}
 		dev := Device{Info: info, IP: ua.IP.String()}
+		d.logOnce("heard-"+info.Fingerprint, "discovery: heard %q (%s) at %s:%d over multicast", info.Alias, info.DeviceType, dev.IP, info.Port)
 		d.n.addDevice(dev)
 		if info.isAnnounce() && d.n.discoverable() {
 			go d.answer(dev)
@@ -137,6 +164,7 @@ func (d *discovery) answer(dev Device) {
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
 	defer cancel()
 	if _, err := d.n.register(ctx, dev); err != nil {
+		d.logOnce("answer-"+dev.Fingerprint, "discovery: can't reach %q at %s to answer (%v); answering over multicast", dev.Alias, dev.Addr(), err)
 		d.announce(false)
 	}
 }

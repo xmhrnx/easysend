@@ -1,9 +1,14 @@
 package ui
 
 import (
+	"strconv"
+
 	"github.com/xmhrnx/giode"
 	"github.com/xmhrnx/giode/store"
 	"github.com/xmhrnx/giode/support"
+
+	"easysend/internal/diag"
+	"easysend/internal/netutil"
 )
 
 // Support settings. Reports become GitHub issues through the support
@@ -31,6 +36,7 @@ func newSupport(u *UI) *support.Support {
 		DonateURL: donateURL,
 		Tips:      tipProducts,
 		Toasts:    u.toasts,
+		Logs:      u.networkLog,
 	})
 }
 
@@ -58,4 +64,12 @@ func (s *settingsScreen) supportCard() giode.Element {
 		return giode.Box(giode.Styles{Display: giode.DisplayNone})
 	}
 	return settingsCard("Help & support", "heart", rows...)
+}
+
+// networkLog is what "Include recent logs" attaches to a report: this
+// device's adapters and addresses now, then what the networking did.
+func (u *UI) networkLog() string {
+	self := u.eng.Self()
+	return "links: " + u.eng.LANBase() + "\nnearby port: " + strconv.Itoa(self.Port) + ", browser port: " + strconv.Itoa(self.WebPort) +
+		"\n\n" + netutil.Describe() + "\n" + diag.Lines()
 }
