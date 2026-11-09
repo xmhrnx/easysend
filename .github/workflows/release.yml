@@ -83,6 +83,45 @@ jobs:
             dist/android/*.aab
             dist/android/native-debug-symbols.zip
 
+  snap:
+    needs: test
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
+    env:
+      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc pkg-config libwayland-dev libx11-dev libx11-xcb-dev libxkbcommon-x11-dev libgles2-mesa-dev libegl1-mesa-dev libffi-dev libxcursor-dev libvulkan-dev
+          go install github.com/xmhrnx/giode-cli/cmd/giode@latest
+      - name: Snap project
+        # Without snapcraft here, giode writes the project the next step
+        # packs.
+        run: giode build -arch ${{ matrix.arch }} snap
+      - uses: snapcore/action-build@v1
+        id: snapcraft
+        with:
+          path: dist/linux/snap
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snap-${{ matrix.arch }}
+          path: ${{ steps.snapcraft.outputs.snap }}
+      - name: Upload to the Snap Store
+        if: github.ref_type == 'tag' && env.SNAPCRAFT_STORE_CREDENTIALS != ''
+        uses: snapcore/action-publish@v1
+        with:
+          snap: ${{ steps.snapcraft.outputs.snap }}
+          release: stable
+
   macos:
     needs: test
     runs-on: macos-latest
@@ -172,7 +211,7 @@ jobs:
           path: dist/ios/*.ipa
 
   publish:
-    needs: [linux, macos, ios]
+    needs: [linux, snap, macos, ios]
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     steps:

@@ -11,7 +11,7 @@ package = "."
 platforms = ["windows", "macos", "linux", "android", "ios"]
 publisher = "EasySend"
 description = "Send files, folders and text nearby, over the internet, or to any browser."
-website = ""
+website = "https://github.com/xmhrnx/easysend"
 splash_color = "#0A0A0B"        # launch screen (dark mode)
 splash_color_light = "#F4F4F6"  # launch screen (light mode)
 share_target = true             # in the phone share sheet for files and text
@@ -58,14 +58,40 @@ desktop_shortcut = true
 firewall = true              # let phones and browsers on the local network reach EasySend
 firewall_public = true       # also on networks Windows marks Public (many home Wi-Fi)
 
-[windows.msix]
-publisher = "CN=EasySend"          # must match the signing certificate's subject
+[windows.msix]                    # Microsoft Store: Partner Center → EasySend → Product identity
+identity_name = "MehranZahir.EasySend"
+publisher = "CN=B40E8F57-A7E0-40BB-8E74-5D051D0B578B"
+publisher_display_name = "Mehran Zahir"
 startup_task = true
 
 [linux]
+app_id = "io.github.xmhrnx.EasySend"   # Flathub's ID (app.id needs a domain we don't own); Linux only
+maintainer = "Mehran <xmhrnx@users.noreply.github.com>"   # .deb/.rpm metadata
 categories = ["Network", "FileTransfer", "Utility"]
 description = "EasySend sends files, folders and text between devices: nearby with discovery (compatible with LocalSend), anywhere over the internet with a short code (compatible with Magic Wormhole), and to anyone with a browser through a link or QR code."
 license = "Apache-2.0"
+# Flatpak sandbox: window and GPU, the network (nearby transfers, links,
+# internet codes), received files in Downloads, the tray, notifications,
+# and start at login.
+flatpak_permissions = [
+  "--share=ipc",
+  "--socket=wayland",
+  "--socket=fallback-x11",
+  "--device=dri",
+  "--share=network",
+  "--filesystem=xdg-download",
+  "--talk-name=org.kde.StatusNotifierWatcher",
+  "--talk-name=org.freedesktop.Notifications",
+  "--filesystem=xdg-config/autostart:create",
+]
+screenshots = [
+  { url = "https://raw.githubusercontent.com/xmhrnx/easysend/main/docs/screenshots/send.png", caption = "Send files nearby, over the internet or with a link" },
+  { url = "https://raw.githubusercontent.com/xmhrnx/easysend/main/docs/screenshots/receive.png", caption = "Receive from nearby devices, a code or any browser" },
+]
+
+[linux.snap]                     # registered on snapcraft.io; adds the release workflow's snap job
+name = "easysend"
+plugs = ["desktop", "desktop-legacy", "wayland", "x11", "opengl", "network", "network-bind", "home"]
 
 [[context_actions]]
 id = "send"
