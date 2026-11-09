@@ -50,6 +50,15 @@ min_os = 11
 [macos.usage]
 local_network = "EasySend finds nearby devices and exchanges files with them on your network."
 
+[macos.plist]
+LSApplicationCategoryType = "public.app-category.utilities"   # the Mac App Store requires it
+
+[macos.store]                     # giode build mas; CI takes the profile from MACOS_PROFILE_BASE64
+entitlements = ["network.client", "network.server", "files.user-selected.read-write", "files.downloads.read-write"]
+
+[privacy]                         # PrivacyInfo.xcprivacy for the App Store
+tracking = false
+
 [windows]
 arch = "amd64"
 
