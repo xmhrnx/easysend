@@ -8,10 +8,10 @@ import (
 
 // Support settings. Reports become GitHub issues through the support
 // relay (giode/support/relay, a Cloudflare Worker with "easysend" mapped
-// to xmhrnx/easysend in its APPS); leave reportURL empty until it's
-// deployed and the Report button stays hidden.
+// to xmhrnx/easysend in its APPS). With reportURL empty the Report button
+// stays hidden.
 const (
-	reportURL = ""
+	reportURL = "https://giode-support.zahiroddinimehran.workers.dev/report"
 	reportApp = "easysend"
 	donateURL = "https://ko-fi.com/xmhrnx"
 )
