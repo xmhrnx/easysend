@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/xmhrnx/giode"
@@ -19,6 +20,9 @@ const (
 	reportURL = "https://giode-support.zahiroddinimehran.workers.dev/report"
 	reportApp = "easysend"
 	donateURL = "https://ko-fi.com/xmhrnx"
+	// privacyURL is the privacy policy (PRIVACY.md), linked from Settings
+	// and the store listings.
+	privacyURL = "https://github.com/xmhrnx/easysend/blob/main/PRIVACY.md"
 )
 
 // tipProducts are the consumable in-app products offered as tips where
@@ -72,4 +76,13 @@ func (u *UI) networkLog() string {
 	self := u.eng.Self()
 	return "links: " + u.eng.LANBase() + "\nnearby port: " + strconv.Itoa(self.Port) + ", browser port: " + strconv.Itoa(self.WebPort) +
 		"\n\n" + netutil.Describe() + "\n" + diag.Lines()
+}
+
+// openPrivacyPolicy opens the privacy policy in the browser.
+func (u *UI) openPrivacyPolicy() {
+	go func() {
+		if err := u.app.OpenURL(context.Background(), privacyURL); err != nil {
+			u.app.Post(func() { u.toast(giode.ToastError, "Couldn't open the privacy policy: "+err.Error()) })
+		}
+	}()
 }
