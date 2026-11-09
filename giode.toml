@@ -11,7 +11,7 @@ package = "."
 platforms = ["windows", "macos", "linux", "android", "ios"]
 publisher = "EasySend"
 description = "Send files, folders and text nearby, over the internet, or to any browser."
-website = ""
+website = "https://github.com/xmhrnx/easysend"
 splash_color = "#0A0A0B"        # launch screen (dark mode)
 splash_color_light = "#F4F4F6"  # launch screen (light mode)
 share_target = true             # in the phone share sheet for files and text
@@ -63,9 +63,24 @@ publisher = "CN=EasySend"          # must match the signing certificate's subjec
 startup_task = true
 
 [linux]
+maintainer = "Mehran <xmhrnx@users.noreply.github.com>"   # .deb/.rpm metadata
 categories = ["Network", "FileTransfer", "Utility"]
 description = "EasySend sends files, folders and text between devices: nearby with discovery (compatible with LocalSend), anywhere over the internet with a short code (compatible with Magic Wormhole), and to anyone with a browser through a link or QR code."
 license = "Apache-2.0"
+# Flatpak sandbox: window and GPU, the network (nearby transfers, links,
+# internet codes), received files in Downloads, the tray, notifications,
+# and start at login.
+flatpak_permissions = [
+  "--share=ipc",
+  "--socket=wayland",
+  "--socket=fallback-x11",
+  "--device=dri",
+  "--share=network",
+  "--filesystem=xdg-download",
+  "--talk-name=org.kde.StatusNotifierWatcher",
+  "--talk-name=org.freedesktop.Notifications",
+  "--filesystem=xdg-config/autostart:create",
+]
 
 [[context_actions]]
 id = "send"
