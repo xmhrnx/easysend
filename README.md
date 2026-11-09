@@ -123,6 +123,10 @@ packages, and attaches them to the release. Packages are signed when the reposit
 the signing secrets the workflow names; otherwise they're unsigned. After changing `[ci]`,
 regenerate it with `giode ci -f`.
 
+## Privacy
+
+See [PRIVACY.md](PRIVACY.md): no accounts, no ads, no analytics; files go device to device.
+
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE).

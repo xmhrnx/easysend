@@ -68,6 +68,7 @@ func (s *settingsScreen) content() giode.Element {
 		s.supportCard(),
 		settingsCard("About", "info",
 			settingRow("EasySend "+version(), "Nearby transfers speak the open LocalSend protocol; internet transfers speak Magic Wormhole. Both are end-to-end encrypted.", giode.Box(giode.Styles{})),
+			settingRow("Privacy", "No accounts, no ads, no tracking. The developer never sees what you send.", s.privacy),
 		),
 	)
 	return pageFrame("Settings", "Make EasySend yours.", nil, body...)

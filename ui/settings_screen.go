@@ -17,6 +17,7 @@ type settingsScreen struct {
 	scroll *scroll.Scroll
 
 	report, donate *giode.ButtonElement
+	privacy        *giode.ButtonElement
 
 	name   *input.Input
 	theme  *segmented.Control
@@ -106,6 +107,7 @@ func newSettingsScreen(u *UI) *settingsScreen {
 
 	s.report = softButton("Report…", "report", u.help.Report)
 	s.donate = primaryButton("Donate", "heart", u.help.Donate)
+	s.privacy = softButton("Privacy policy", "shield", u.openPrivacyPolicy)
 	s.scroll = giode.Scroll(s.content, scrollStyles)
 	return s
 }
