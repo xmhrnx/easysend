@@ -1,0 +1,39 @@
+# Publishes the website (site/) to GitHub Pages. It runs only when started
+# by hand: Actions → Website → Run workflow.
+name: Website
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble the site
+        run: |
+          mkdir -p _site/fonts _site/img
+          cp site/index.html _site/
+          cp assets/icon.svg assets/icon.png _site/
+          cp assets/fonts/Inter-Regular.ttf assets/fonts/Inter-Medium.ttf assets/fonts/Inter-SemiBold.ttf \
+             assets/fonts/Inter-Bold.ttf assets/fonts/InterDisplay-Bold.ttf _site/fonts/
+          cp docs/screenshots/send.png docs/screenshots/phone-send.png _site/img/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
