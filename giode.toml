@@ -116,10 +116,6 @@ screenshots = [
   { url = "https://raw.githubusercontent.com/xmhrnx/easysend/main/docs/screenshots/receive.png", caption = "Receive from nearby devices, a code or any browser" },
 ]
 
-[linux.snap]                     # registered on snapcraft.io; adds the release workflow's snap job
-name = "easysend"
-plugs = ["desktop", "desktop-legacy", "wayland", "x11", "opengl", "network", "network-bind", "home"]
-
 [[context_actions]]
 id = "send"
 label = "Send with EasySend"
