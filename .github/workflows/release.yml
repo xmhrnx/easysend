@@ -94,7 +94,9 @@ jobs:
             # snapcraft builds against Ubuntu 24.04 (core24).
             runner: ubuntu-24.04
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 60
+    # The Snap Store can be slow; a failed snap doesn't hold back the
+    # release (see publish).
+    timeout-minutes: 120
     env:
       SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
     steps:
@@ -111,10 +113,15 @@ jobs:
         # Without snapcraft here, giode writes the project the next step
         # packs.
         run: giode build -arch ${{ matrix.arch }} snap
-      - uses: snapcore/action-build@v1
+      - name: Pack the snap
         id: snapcraft
-        with:
-          path: dist/linux/snap
+        # On the runner itself (Ubuntu 24.04, as core24), without
+        # snapcraft's build container.
+        working-directory: dist/linux/snap
+        run: |
+          sudo snap install snapcraft --classic
+          sudo snapcraft pack --destructive-mode
+          echo "snap=$PWD/$(ls -1 *.snap | head -n 1)" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: snap-${{ matrix.arch }}
@@ -156,6 +163,11 @@ jobs:
           rm cert.p12
       - name: Build
         env:
+          # Signed with the certificate's Developer ID identity, and
+          # notarized with these (macos.notary_id, macos.notary_team_id
+          # when not set here).
+          GIODE_NOTARY_ID: ${{ secrets.GIODE_NOTARY_ID }}
+          GIODE_NOTARY_TEAM_ID: ${{ secrets.GIODE_NOTARY_TEAM_ID }}
           GIODE_NOTARY_PASS: ${{ secrets.GIODE_NOTARY_PASS }}
         run: |
           release=""
@@ -249,7 +261,7 @@ jobs:
 
   publish:
     needs: [linux, snap, macos, ios]
-    if: github.ref_type == 'tag'
+    if: ${{ !cancelled() && github.ref_type == 'tag' && needs.linux.result == 'success' && needs.macos.result == 'success' && needs.ios.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
