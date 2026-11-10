@@ -4,6 +4,10 @@ Send files, folders and text between any devices — nearby, across the internet
 someone who doesn't have the app. Built in Go with [Giode](https://github.com/xmhrnx/giode)
 for Windows, macOS, Linux, Android and iOS.
 
+**Get it:** [Microsoft Store](https://apps.microsoft.com/detail/9NRD1RDP4J3C) ·
+[GitHub releases](https://github.com/xmhrnx/easysend/releases/latest) (Windows, macOS, Linux, Android) ·
+[website](https://xmhrnx.github.io/easysend/)
+
 ![EasySend](docs/screenshots/send.png)
 
 ## Three ways to send
