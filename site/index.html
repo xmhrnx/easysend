@@ -201,7 +201,7 @@ section { padding: 110px 0; }
 .textlink, .textlink svg { transition: gap .2s; }
 
 /* Download */
-.plats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.plats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .plat { display: flex; flex-direction: column; gap: 16px; padding: 24px 22px; border-radius: 20px; background: var(--surface); border: 1px solid var(--border);
   transition: border-color .25s, transform .25s; }
 .plat:hover, .plat.mine { border-color: var(--line); }
@@ -214,8 +214,14 @@ section { padding: 110px 0; }
 .plat .where a:hover { border-color: var(--accent); color: var(--accent); }
 .plat .where a svg { width: 15px; height: 15px; color: var(--muted); }
 .plat .where a.soon { color: var(--muted); pointer-events: none; border-style: dashed; }
+/* The browser card: whatever you own, as long as it opens web pages. */
+.plat.browser { border-style: dashed; border-color: var(--line); }
+.plat.browser .roll { font-family: "Inter Display", "Inter", sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -.02em;
+  line-height: 1.2; min-height: 2.4em; color: var(--accent); transition: opacity .35s, transform .35s; }
+.plat.browser .roll.out { opacity: 0; transform: translateY(-8px); }
+.plat.browser .roll.punch { color: var(--text); }
+.plat.browser p { color: var(--muted); font-size: 14px; line-height: 1.55; margin-top: auto; }
 .badge { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
-@media (max-width: 1060px) { .plats { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 720px) { .plats { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 460px) { .plats { grid-template-columns: 1fr; } }
 
@@ -289,6 +295,7 @@ footer small { color: var(--muted); font-size: 13px; width: 100%; }
       <div class="pills">
         <span class="pill"><span class="dot"></span>Windows · macOS · Linux</span>
         <span class="pill"><span class="dot"></span>Android · iPhone · iPad</span>
+        <span class="pill"><span class="dot"></span>Your fridge</span>
       </div>
     </div>
     <div class="radar" id="radar" aria-hidden="true">
@@ -413,7 +420,7 @@ footer small { color: var(--muted); font-size: 13px; width: 100%; }
     <div class="head center reveal">
       <div class="overline">Download</div>
       <h2>Get EasySend.</h2>
-      <p>Free on every platform. Install it on two devices and you’re ready.</p>
+      <p>Free on every platform. Install it on two devices and you’re ready — or just one, and send to anything that opens a web page.</p>
     </div>
     <div class="plats reveal" id="plats"></div>
   </div>
@@ -477,6 +484,43 @@ for (const p of PLATFORMS) {
   }
   plats.append(el);
 }
+
+// The sixth platform: anything that can open a link.
+(() => {
+  const el = document.createElement("div");
+  el.className = "plat browser";
+  el.innerHTML = `<div class="os"><div class="tile"><svg class="i"><use href="#i-globe"/></svg></div><span class="badge">No install</span></div>
+    <h3>Everything else</h3><div class="roll" aria-live="off"></div>
+    <p>Send it a link or a QR code from EasySend and it downloads in the browser. Turn on “Receive from a browser” and it can send back.</p>`;
+  plats.append(el);
+  const roll = el.querySelector(".roll");
+  const things = [
+    "Your fridge.", "Your car.", "Your Chromebook.", "The hotel lobby computer.", "Your smart TV from 2014.",
+    "Your grandma’s netbook.", "A Kindle, technically.", "Your Steam Deck.", "The airplane seatback screen.",
+    "Your smart toaster, allegedly.", "A library computer that smells like 2003.", "Your Tesla, at a red light. Please.",
+  ];
+  const punch = "…anything with a browser.";
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { roll.textContent = "Your fridge. Your car. " + punch; return; }
+  // Three random things, then the punchline; over and over.
+  let shown = 0, pool = [];
+  const next = () => {
+    let text, isPunch = shown === 3;
+    if (isPunch) { text = punch; shown = 0; }
+    else {
+      if (!pool.length) pool = things.slice().sort(() => Math.random() - .5);
+      text = pool.pop(); shown++;
+    }
+    roll.classList.add("out");
+    setTimeout(() => {
+      roll.textContent = text;
+      roll.classList.toggle("punch", isPunch);
+      roll.classList.remove("out");
+      setTimeout(next, isPunch ? 2600 : 1500);
+    }, 350);
+  };
+  roll.textContent = things[0]; shown = 1; pool = things.slice(1).sort(() => Math.random() - .5);
+  setTimeout(next, 1500);
+})();
 const mp = PLATFORMS.find(p => p.id === mine);
 if (mp) document.querySelector("#hero-dl span").textContent = `Download for ${mp.name}`;
 
