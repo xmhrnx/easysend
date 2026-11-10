@@ -58,6 +58,24 @@ entitlements = ["network.client", "network.server", "files.user-selected.read-wr
 
 [privacy]                         # PrivacyInfo.xcprivacy for the App Store
 tracking = false
+# Report a problem sends these when the user chooses to (see PRIVACY.md).
+# Linked: the report can carry the user's email address.
+[[privacy.collected]]
+type = "customer_support"         # the summary and details they type
+linked = true
+purposes = ["app_functionality"]
+[[privacy.collected]]
+type = "email_address"            # optional, so the developer can reply
+linked = true
+purposes = ["app_functionality"]
+[[privacy.collected]]
+type = "crash_data"               # the last crash, if ticked
+linked = true
+purposes = ["app_functionality"]
+[[privacy.collected]]
+type = "other_diagnostic_data"    # app and OS version, device model, networking log
+linked = true
+purposes = ["app_functionality"]
 
 [windows]
 arch = "amd64"

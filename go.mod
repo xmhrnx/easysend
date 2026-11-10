@@ -6,7 +6,7 @@ require (
 	gioui.org v0.10.2
 	github.com/psanford/wormhole-william v1.0.8
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
-	github.com/xmhrnx/giode v1.0.4-alpha.1
+	github.com/xmhrnx/giode v1.0.5-alpha.1
 	golang.org/x/net v0.62.0
 	golang.org/x/sys v0.49.0
 )
