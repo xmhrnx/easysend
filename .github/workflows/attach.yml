@@ -1,0 +1,37 @@
+# Attaches the packages a release run built to its release, for when the
+# run's publish job didn't (a platform failed or the run was cancelled).
+# Actions → Attach builds → Run workflow, with the run's ID (the number
+# in its URL) and the release's tag.
+name: Attach builds
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Release run ID (from its URL)
+        required: true
+      tag:
+        description: Release tag (e.g. v1.0.2)
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  attach:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+          path: artifacts
+      - name: Upload to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          find artifacts -type f -print
+          find artifacts -type f -print0 | xargs -0 gh release upload "$TAG" --clobber --repo "$GITHUB_REPOSITORY"
