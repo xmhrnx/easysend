@@ -32,7 +32,13 @@ func newDropZone(u *UI) *dropZone {
 			Label(label).OnClick(func(giode.ClickEvent) { fn() })
 		d.actions = append(d.actions, a)
 	}
-	add("Files", "file", true, u.pickFiles)
+	if !platform.IsDesktop {
+		// On phones most of what people send lives in the photo library.
+		add("Photos", "image", true, u.pickMedia)
+		add("Files", "file", false, u.pickFiles)
+	} else {
+		add("Files", "file", true, u.pickFiles)
+	}
 	if platform.IsDesktop {
 		add("Folder", "folder", false, u.pickFolder)
 	}

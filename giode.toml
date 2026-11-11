@@ -34,6 +34,7 @@ icon_monochrome = "assets/android-monochrome.png"
 
 [ios]
 min_os = 15
+icon = "assets/icon-ios.png"   # opaque and full-bleed: iOS rounds the corners itself
 
 [ios.usage]
 local_network = "EasySend finds nearby devices and exchanges files with them on your network."

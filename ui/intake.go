@@ -80,13 +80,28 @@ func (u *UI) sent(items []item.Item) {
 
 // pickFiles shows the file picker and adds the chosen files.
 func (u *UI) pickFiles() {
+	u.pick("files", func(ctx context.Context) ([]giode.PickedFile, error) {
+		return u.app.PickFiles(ctx, giode.PickOptions{Multiple: true})
+	})
+}
+
+// pickMedia shows the photo library (the Photos picker on iOS) and adds
+// the chosen photos and videos, as their original files.
+func (u *UI) pickMedia() {
+	u.pick("photos", func(ctx context.Context) ([]giode.PickedFile, error) {
+		return u.app.PickMedia(ctx, giode.MediaOptions{})
+	})
+}
+
+// pick runs a picker on a goroutine and adds what was chosen.
+func (u *UI) pick(what string, picker func(context.Context) ([]giode.PickedFile, error)) {
 	go func() {
-		files, err := u.app.PickFiles(context.Background(), giode.PickOptions{Multiple: true})
+		files, err := picker(context.Background())
 		if errors.Is(err, giode.ErrCanceled) {
 			return
 		}
 		if err != nil {
-			u.app.Post(func() { u.toast(giode.ToastError, "Couldn't open files: "+err.Error()) })
+			u.app.Post(func() { u.toast(giode.ToastError, "Couldn't open "+what+": "+err.Error()) })
 			return
 		}
 		var added []item.Item
