@@ -6,6 +6,7 @@ import (
 	"gioui.org/layout"
 	"github.com/xmhrnx/giode"
 
+	"easysend/internal/engine"
 	"easysend/internal/item"
 	"easysend/internal/transfer"
 )
@@ -27,7 +28,9 @@ func (p *internetPanel) start() {
 		p.u.toast(giode.ToastInfo, "Choose something to send first")
 		return
 	}
-	p.u.eng.SendInternet(append([]item.Item(nil), p.u.items...))
+	items := append([]item.Item(nil), p.u.items...)
+	id := p.u.eng.SendInternet(items)
+	p.u.pin.watch(id, engine.Peer{}, items) // takes them off the list once delivered
 }
 
 func (p *internetPanel) Layout(gtx layout.Context) layout.Dimensions {

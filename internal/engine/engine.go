@@ -75,6 +75,14 @@ func Start(cfg Config) (*Engine, error) {
 	return e, nil
 }
 
+// Resume reopens the listening sockets, which iOS takes back while the
+// app is suspended: call it when the app returns to the foreground.
+func (e *Engine) Resume() {
+	e.node.Resume()
+	e.web.Resume()
+	e.changed()
+}
+
 // Close stops every service.
 func (e *Engine) Close() {
 	e.mu.Lock()

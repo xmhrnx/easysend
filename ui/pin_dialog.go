@@ -82,6 +82,9 @@ func (d *pinDialog) Layout(gtx layout.Context) layout.Dimensions {
 			continue
 		}
 		d.shown[id] = true
+		if t.Status == transfer.Done {
+			d.u.sent(s.items)
+		}
 		if engine.IsPINError(t) && !d.open {
 			d.current = s
 			d.open = true

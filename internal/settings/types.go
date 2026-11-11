@@ -37,6 +37,9 @@ type Settings struct {
 	PIN           string     `json:"pin"`
 	Discoverable  bool       `json:"discoverable"`
 	Notifications bool       `json:"notifications"`
+	// KeepAfterSend keeps the send list once its items are sent; by
+	// default they leave it, so the next send starts empty.
+	KeepAfterSend bool `json:"keepAfterSend"`
 
 	MinimizeToTray bool `json:"minimizeToTray"`
 	CloseToTray    bool `json:"closeToTray"`

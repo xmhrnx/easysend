@@ -7,6 +7,7 @@ import (
 	"image"
 	"log"
 	"net/url"
+	"runtime"
 
 	"github.com/xmhrnx/giode"
 	"github.com/xmhrnx/giode/crash"
@@ -57,7 +58,7 @@ func main() {
 		Icon:           assets.Icon,
 		Background:     "theme.background",
 		StatusBar:      "theme.background",
-		NavigationBar:  "theme.surface",
+		NavigationBar:  "theme.background",
 		MinimizeToTray: s.MinimizeToTray,
 		CloseToTray:    s.CloseToTray,
 		StartInTray:    startInTray,
@@ -68,7 +69,13 @@ func main() {
 		OnShareReceived: func(s giode.SharedContent) { u.ReceiveShare(s) },
 		OnOpenURL:       func(link *url.URL) { u.OpenLink(link) },
 		OnBackground:    discovery.stop,
-		OnForeground:    discovery.start,
+		OnForeground: func() {
+			discovery.start()
+			// iOS takes back a suspended app's sockets; reopen them.
+			if runtime.GOOS == "ios" && eng != nil {
+				eng.Resume()
+			}
+		},
 		ContextActions: []giode.ContextAction{
 			{ID: "send", Label: "Send with EasySend", Files: true, Folders: true},
 		},

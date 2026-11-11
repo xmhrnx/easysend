@@ -45,6 +45,11 @@ func (b *bottomNav) Layout(gtx layout.Context) layout.Dimensions {
 	for i, p := range b.items {
 		kids[i] = p
 	}
-	return giode.Row(giode.Styles{Width: -1, Background: "theme.surface", Padding: giode.Inset{Top: 4, Bottom: 6}, Wrap: giode.WrapNoWrap,
-		BoxShadow: giode.BoxShadow{Y: -2, Blur: 16, Color: "#00000022"}}, kids...).Layout(gtx)
+	// The page's own background, with a hairline on top: the strip the
+	// system keeps below the bar (home indicator, gesture bar) is that
+	// color too, so the bar runs flush to the bottom edge.
+	return giode.Stack(giode.Styles{Width: -1, Background: "theme.background"},
+		giode.Divider(giode.Styles{Color: "theme.border"}),
+		giode.Row(giode.Styles{Width: -1, Padding: giode.Inset{Top: 4, Bottom: 6}, Wrap: giode.WrapNoWrap}, kids...),
+	).Layout(gtx)
 }

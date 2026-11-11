@@ -57,6 +57,27 @@ func (u *UI) removeItem(id string) {
 
 func (u *UI) clearItems() { giode.AfterLayout(func() { u.items = nil }) }
 
+// sent takes items that were delivered off the send list, unless the
+// user keeps the list (Settings → Sending). Items added since stay.
+func (u *UI) sent(items []item.Item) {
+	if u.eng.Settings.Get().KeepAfterSend {
+		return
+	}
+	done := make(map[string]bool, len(items))
+	for _, it := range items {
+		done[it.ID] = true
+	}
+	giode.AfterLayout(func() {
+		kept := u.items[:0]
+		for _, it := range u.items {
+			if !done[it.ID] {
+				kept = append(kept, it)
+			}
+		}
+		u.items = kept
+	})
+}
+
 // pickFiles shows the file picker and adds the chosen files.
 func (u *UI) pickFiles() {
 	go func() {

@@ -3,10 +3,12 @@ package localsend
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"net"
 	"net/http"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"easysend/internal/diag"
@@ -41,10 +43,11 @@ type Config struct {
 // a client for sending.
 type Node struct {
 	cfg      Config
+	sockMu   sync.Mutex // guards ln and disc, which Resume replaces
 	ln       net.Listener
 	srv      *http.Server
 	client   *http.Client
-	port     int
+	port     atomic.Int32 // Resume may change it
 	protocol string
 
 	mu      sync.Mutex
@@ -67,30 +70,63 @@ func Start(cfg Config) (*Node, error) {
 	case port < 0:
 		port = 0 // any free port (tests)
 	}
+	n.client = newClient()
+	n.srv = &http.Server{Handler: n.routes(), ReadHeaderTimeout: 15 * time.Second}
+	if err := n.listen(port); err != nil {
+		return nil, err
+	}
+	n.disc = startDiscovery(n)
+	return n, nil
+}
+
+// listen opens the TCP listener on port (any free port when it's taken)
+// and serves on it.
+func (n *Node) listen(port int) error {
 	ln, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	if err != nil {
 		diag.Logf("nearby: TCP port %d unavailable (%v); using another", port, err)
 		ln, err = net.Listen("tcp", ":0")
 		if err != nil {
 			diag.Logf("nearby: no TCP port: %v", err)
-			return nil, err
+			return err
 		}
 	}
-	n.port = ln.Addr().(*net.TCPAddr).Port
-	diag.Logf("nearby: listening on TCP %d (%s)", n.port, n.protocol)
-	if cfg.Cert != nil {
-		ln = tls.NewListener(ln, &tls.Config{Certificates: []tls.Certificate{*cfg.Cert}, MinVersion: tls.VersionTLS12})
+	n.port.Store(int32(ln.Addr().(*net.TCPAddr).Port))
+	diag.Logf("nearby: listening on TCP %d (%s)", n.Port(), n.protocol)
+	if n.cfg.Cert != nil {
+		ln = tls.NewListener(ln, &tls.Config{Certificates: []tls.Certificate{*n.cfg.Cert}, MinVersion: tls.VersionTLS12})
 	}
 	n.ln = ln
-	n.client = newClient()
-	n.srv = &http.Server{Handler: n.routes(), ReadHeaderTimeout: 15 * time.Second}
 	go func() {
-		if err := n.srv.Serve(ln); err != nil && err != http.ErrServerClosed {
+		if err := n.srv.Serve(ln); err != nil && err != http.ErrServerClosed && !errors.Is(err, net.ErrClosed) {
 			diag.Logf("nearby: server stopped: %v", err)
 		}
 	}()
+	return nil
+}
+
+// Resume replaces the listener and discovery's socket. iOS takes the
+// sockets of a suspended app back, so after it comes to the foreground
+// nothing would answer on the old ones: senders get "connection
+// refused". Transfers already connected keep their own connections.
+func (n *Node) Resume() {
+	n.sockMu.Lock()
+	defer n.sockMu.Unlock()
+	if n.ln != nil {
+		_ = n.ln.Close()
+	}
+	if err := n.listen(n.Port()); err != nil {
+		n.ln = nil
+	}
+	n.disc.close()
 	n.disc = startDiscovery(n)
-	return n, nil
+	diag.Logf("nearby: sockets reopened after resuming")
+}
+
+func (n *Node) discovery() *discovery {
+	n.sockMu.Lock()
+	defer n.sockMu.Unlock()
+	return n.disc
 }
 
 func newClient() *http.Client {
@@ -106,14 +142,14 @@ func newClient() *http.Client {
 
 // Close stops the node.
 func (n *Node) Close() error {
-	n.disc.close()
+	n.discovery().close()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	return n.srv.Shutdown(ctx)
 }
 
 // Port is the port the node listens on.
-func (n *Node) Port() int { return n.port }
+func (n *Node) Port() int { return int(n.port.Load()) }
 
 // Protocol is "https" or "http".
 func (n *Node) Protocol() string { return n.protocol }
@@ -123,7 +159,7 @@ func (n *Node) Self() Info {
 	info := n.cfg.Self()
 	info.Version = ProtocolVer
 	info.Fingerprint = n.cfg.Fingerprint
-	info.Port = n.port
+	info.Port = n.Port()
 	info.Protocol = n.protocol
 	return info
 }

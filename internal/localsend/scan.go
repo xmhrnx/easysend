@@ -15,7 +15,7 @@ import (
 // Refresh announces again and scans the local subnets for devices that
 // don't answer multicast (common on guest Wi-Fi and Android).
 func (n *Node) Refresh(ctx context.Context) {
-	n.disc.announce(true)
+	n.discovery().announce(true)
 	n.scan(ctx)
 }
 

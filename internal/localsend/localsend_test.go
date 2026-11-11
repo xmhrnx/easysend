@@ -112,3 +112,21 @@ func TestDecline(t *testing.T) {
 		t.Fatalf("got %v", err)
 	}
 }
+
+// TestResume checks a node answers on the same port after its sockets
+// are replaced, as after iOS resumes the app.
+func TestResume(t *testing.T) {
+	recv := node(t, "Receiver", Config{})
+	send := node(t, "Sender", Config{})
+	port := recv.Port()
+	recv.Resume()
+	if recv.Port() != port {
+		t.Fatalf("port changed from %d to %d", port, recv.Port())
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	dev, err := send.Register(ctx, "127.0.0.1:"+strconv.Itoa(recv.Port()), true)
+	if err != nil || dev.Alias != "Receiver" {
+		t.Fatalf("register after resume: %v %+v", err, dev)
+	}
+}

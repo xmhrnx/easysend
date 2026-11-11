@@ -4,8 +4,10 @@
 package webshare
 
 import (
+	"net"
 	"net/http"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"easysend/internal/item"
@@ -47,7 +49,9 @@ type Config struct {
 type Server struct {
 	cfg  Config
 	srv  *http.Server
-	port int
+	lnMu sync.Mutex // guards ln, which Resume replaces
+	ln   net.Listener
+	port atomic.Int32 // Resume may change it
 
 	mu     sync.Mutex
 	shares map[string]*Share

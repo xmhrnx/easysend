@@ -20,7 +20,7 @@ type activityScreen struct {
 func newActivityScreen(u *UI) *activityScreen {
 	a := &activityScreen{u: u}
 	a.filter = giode.Input.Segmented("All", "Sent", "Received")
-	a.filter.Styles(giode.Styles{Width: 300})
+	a.filter.Styles(giode.Styles{Width: -1})
 	a.clear = softButton("Clear history", "trash", func() { giode.AfterLayout(u.eng.Transfers.ClearFinished) })
 	a.scroll = giode.Scroll(a.content, scrollStyles)
 	return a
