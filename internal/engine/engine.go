@@ -26,6 +26,11 @@ func Start(cfg Config) (*Engine, error) {
 	if err != nil {
 		return nil, fmt.Errorf("settings: %w", err)
 	}
+	if cfg.FixedDownloadDir && st.Get().DownloadDir != cfg.DownloadDir {
+		if err := st.Update(func(s *settings.Settings) { s.DownloadDir = cfg.DownloadDir }); err != nil {
+			return nil, fmt.Errorf("settings: %w", err)
+		}
+	}
 	e := &Engine{cfg: cfg, Settings: st}
 	e.Transfers = transfer.NewRegistry(cfg.DataDir, e.changed)
 

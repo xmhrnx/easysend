@@ -87,9 +87,12 @@ func main() {
 			eng, err = engine.Start(engine.Config{
 				DataDir:     platform.DataDir(),
 				DownloadDir: platform.DownloadDir(),
-				DeviceModel: deviceModel(),
-				DeviceType:  platform.DeviceType,
-				OnChange:    app.Invalidate,
+				// Phones can't pick a folder, and iOS moves the app's
+				// container on each update: always use the current one.
+				FixedDownloadDir: !platform.IsDesktop,
+				DeviceModel:      deviceModel(),
+				DeviceType:       platform.DeviceType,
+				OnChange:         app.Invalidate,
 				Notify: func(title, body string) {
 					if err := app.Notify(title, body); err != nil {
 						log.Printf("notify: %v", err)

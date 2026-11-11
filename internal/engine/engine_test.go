@@ -145,3 +145,23 @@ func TestPublishMovesReceivedFiles(t *testing.T) {
 		t.Fatal("not published")
 	}
 }
+
+// TestFixedDownloadDir checks a saved folder from an earlier install (an
+// old iOS container) gives way to the current one.
+func TestFixedDownloadDir(t *testing.T) {
+	dir := t.TempDir()
+	st, err := settings.Open(dir, "/old/container/Documents/EasySend")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = st.Update(func(s *settings.Settings) { s.UPnP = false; s.Port = -1; s.WebPort = 0 })
+	now := filepath.Join(dir, "Documents", "EasySend")
+	e, err := Start(Config{DataDir: dir, DownloadDir: now, FixedDownloadDir: true, DeviceType: localsend.TypeMobile})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer e.Close()
+	if got := e.Settings.Get().DownloadDir; got != now {
+		t.Fatalf("download dir %q, want %q", got, now)
+	}
+}

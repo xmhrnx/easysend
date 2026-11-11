@@ -17,6 +17,10 @@ type Config struct {
 	DataDir string
 	// DownloadDir is the default folder for received files.
 	DownloadDir string
+	// FixedDownloadDir always uses DownloadDir, ignoring a saved choice:
+	// on phones the folder can't be changed, and iOS moves the app's
+	// container on every install and update, so a saved path goes stale.
+	FixedDownloadDir bool
 	// DeviceModel ("MacBook Pro", "Pixel 8") and DeviceType
 	// (localsend.TypeDesktop or localsend.TypeMobile) describe this device.
 	DeviceModel string
