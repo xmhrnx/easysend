@@ -45,11 +45,28 @@ func (b *bottomNav) Layout(gtx layout.Context) layout.Dimensions {
 	for i, p := range b.items {
 		kids[i] = p
 	}
-	// The page's own background, with a hairline on top: the strip the
-	// system keeps below the bar (home indicator, gesture bar) is that
-	// color too, so the bar runs flush to the bottom edge.
-	return giode.Stack(giode.Styles{Width: -1, Background: "theme.background"},
-		giode.Divider(giode.Styles{Color: "theme.border"}),
-		giode.Row(giode.Styles{Width: -1, Padding: giode.Inset{Top: 4, Bottom: 6}, Wrap: giode.WrapNoWrap}, kids...),
-	).Layout(gtx)
+	// A floating pill over the page, which runs to the bottom edge
+	// behind it (see UI.View).
+	return giode.Row(giode.Styles{Width: -1, Padding: giode.SymmetricInset(4, 2), Wrap: giode.WrapNoWrap,
+		Background: "theme.surface", BorderRadius: navRadius, BorderWidth: 1, BorderColor: "theme.border",
+		BoxShadow: giode.BoxShadow{Y: 8, Blur: 28, Color: "#00000030"}}, kids...).Layout(gtx)
+}
+
+// The floating tab bar's size, and how far it sits from the edges.
+const (
+	navHeight = 68 // the pill: items and padding
+	navRadius = 26
+	navMargin = 12 // from the sides, and from the bottom without a home indicator
+)
+
+// navBottom is the gap between the bar and the window's bottom edge:
+// just above the home indicator or gesture bar, where there is one.
+func navBottom() int {
+	return max(navMargin, giode.SafeArea().Bottom-12)
+}
+
+// navClearance is the space a page leaves at its end so its last
+// content can scroll up out from under the floating bar.
+func navClearance() int {
+	return navHeight + navBottom() + 20
 }

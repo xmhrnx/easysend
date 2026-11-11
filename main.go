@@ -55,6 +55,7 @@ func main() {
 		Resizable:      true,
 		Center:         true,
 		Frameless:      platform.IsDesktop, // the UI draws its own title bar
+		EdgeToEdge:     true,               // pages run under the system bars; the tab bar floats (ui.View)
 		Icon:           assets.Icon,
 		Background:     "theme.background",
 		StatusBar:      "theme.background",

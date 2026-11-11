@@ -24,7 +24,8 @@ func sheetActions(buttons ...*giode.ButtonElement) giode.Element {
 	for i, b := range buttons {
 		kids[i] = giode.Box(giode.Styles{FlexGrow: 1}, b)
 	}
-	return giode.Row(giode.Styles{Width: -1, Gap: 10, Wrap: giode.WrapNoWrap, Padding: giode.Inset{Top: 4, Bottom: 8}}, kids...)
+	// Clear of the home indicator: the app is drawn edge to edge.
+	return giode.Row(giode.Styles{Width: -1, Gap: 10, Wrap: giode.WrapNoWrap, Padding: giode.Inset{Top: 4, Bottom: 8 + giode.SafeArea().Bottom}}, kids...)
 }
 
 // wide makes a button fill its slot (sheet footers).

@@ -22,7 +22,11 @@ func pageFrame(title, subtitle string, trailing giode.Element, body ...giode.Ele
 		head = append(head, trailing)
 	}
 	kids := append([]giode.Element{giode.Row(giode.Styles{Width: -1, Align: giode.AlignCenter, Gap: 12, Padding: giode.Inset{Bottom: 8}}, head...)}, body...)
-	return giode.Row(giode.Styles{Width: -1, Justify: giode.JustifyCenter, Padding: giode.Inset{Top: pad, Left: pad, Right: pad, Bottom: 48}},
+	bottom := 48
+	if giode.Compact() {
+		bottom = navClearance() // out from under the floating tab bar
+	}
+	return giode.Row(giode.Styles{Width: -1, Justify: giode.JustifyCenter, Padding: giode.Inset{Top: pad, Left: pad, Right: pad, Bottom: bottom}},
 		giode.Stack(giode.Styles{Width: -1, MaxWidth: 980, Gap: 20}, kids...),
 	)
 }
