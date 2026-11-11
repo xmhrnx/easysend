@@ -43,7 +43,7 @@ local_network = "EasySend finds nearby devices and exchanges files with them on 
 NSBonjourServices = ["_localsend._tcp"]
 UIFileSharingEnabled = true
 LSSupportsOpeningDocumentsInPlace = true
-ITSAppUsesNonExemptEncryption = true   # its own TLS and Magic Wormhole crypto (standard algorithms); answered in App Store Connect
+ITSAppUsesNonExemptEncryption = false  # standard algorithms, not offered in France: no export documentation needed (App Store Connect agrees)
 
 [macos]
 min_os = 11
@@ -52,7 +52,7 @@ min_os = 11
 local_network = "EasySend finds nearby devices and exchanges files with them on your network."
 
 [macos.plist]
-ITSAppUsesNonExemptEncryption = true   # as on iOS
+ITSAppUsesNonExemptEncryption = false  # as on iOS
 LSApplicationCategoryType = "public.app-category.utilities"   # the Mac App Store requires it
 
 [macos.store]                     # giode build mas; CI takes the profile from MACOS_PROFILE_BASE64
