@@ -16,24 +16,8 @@ env:
   GIODE_BUILD: ${{ github.run_number }}
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: stable
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc pkg-config libwayland-dev libx11-dev libx11-xcb-dev libxkbcommon-x11-dev libgles2-mesa-dev libegl1-mesa-dev libffi-dev libxcursor-dev libvulkan-dev
-      - name: Test (giode.toml ci.test)
-        run: |
-          go vet ./... && go test ./...
 
   linux:
-    needs: test
     strategy:
       matrix:
         include:
@@ -86,7 +70,6 @@ jobs:
             dist/android/native-debug-symbols.zip
 
   macos:
-    needs: test
     runs-on: macos-latest
     # A hung signing step fails in an hour rather than GitHub's six.
     timeout-minutes: 60
@@ -157,7 +140,6 @@ jobs:
             dist/macos/appstore/*.pkg
 
   ios:
-    needs: test
     runs-on: macos-latest
     # A hung signing step fails in an hour rather than GitHub's six.
     timeout-minutes: 60

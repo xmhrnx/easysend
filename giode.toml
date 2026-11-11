@@ -129,5 +129,5 @@ folders = true
 # is published, and attaches the packages to that release.
 [ci]
 trigger = "release"
-test = "go vet ./... && go test ./..."
+test = ""                         # no test job: go vet and go test run before each push, not on release
 dispatch = false
