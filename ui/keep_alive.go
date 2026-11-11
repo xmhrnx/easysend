@@ -2,8 +2,17 @@ package ui
 
 import (
 	"log"
+	"runtime"
 	"time"
 )
+
+// ReceivesInBackground says whether the app should keep receiving after
+// it leaves the screen: visible to nearby devices, and not turned off
+// in Settings.
+func (u *UI) ReceivesInBackground() bool {
+	s := u.eng.Settings.Get()
+	return s.Discoverable && !s.NoBackground
+}
 
 // KeepAliveWhileTransferring keeps the app running (phones: a foreground
 // service; desktops: no idle sleep) while transfers are in progress. It
@@ -11,15 +20,34 @@ import (
 func (u *UI) KeepAliveWhileTransferring(stop <-chan struct{}) {
 	t := time.NewTicker(2 * time.Second)
 	defer t.Stop()
-	var release func()
+	var release, ready func()
 	for {
 		select {
 		case <-stop:
 			if release != nil {
 				release()
 			}
+			if ready != nil {
+				ready()
+			}
 			return
 		case <-t.C:
+		}
+		// On Android a foreground service keeps EasySend reachable after
+		// it leaves the screen, so requests arrive (and notify) without
+		// opening the app.
+		want := runtime.GOOS == "android" && u.ReceivesInBackground()
+		switch {
+		case want && ready == nil:
+			r, err := u.app.KeepAlive("Ready to receive from nearby devices")
+			if err != nil {
+				log.Printf("keep alive: %v", err)
+			} else {
+				ready = r
+			}
+		case !want && ready != nil:
+			ready()
+			ready = nil
 		}
 		active := false
 		for _, tr := range u.eng.Transfers.List() {

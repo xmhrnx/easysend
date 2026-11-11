@@ -30,6 +30,7 @@ type settingsScreen struct {
 	pin        *input.Input
 	notify     *toggle.Switch
 	clearSent  *toggle.Switch
+	background *toggle.Switch
 
 	login, minTray, closeTray, hidden *toggle.Switch
 
@@ -84,6 +85,7 @@ func newSettingsScreen(u *UI) *settingsScreen {
 	s.requirePIN = sw(cur.RequirePIN, func(on bool) { update(func(st *settings.Settings) { st.RequirePIN = on }) })
 	s.notify = sw(cur.Notifications, func(on bool) { update(func(st *settings.Settings) { st.Notifications = on }) })
 	s.clearSent = sw(!cur.KeepAfterSend, func(on bool) { update(func(st *settings.Settings) { st.KeepAfterSend = !on }) })
+	s.background = sw(!cur.NoBackground, func(on bool) { update(func(st *settings.Settings) { st.NoBackground = !on }) })
 
 	s.login = sw(u.app.LaunchAtLogin(), func(on bool) {
 		if err := u.app.SetLaunchAtLogin(on); err != nil {

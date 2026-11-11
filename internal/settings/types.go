@@ -40,6 +40,10 @@ type Settings struct {
 	// KeepAfterSend keeps the send list once its items are sent; by
 	// default they leave it, so the next send starts empty.
 	KeepAfterSend bool `json:"keepAfterSend"`
+	// NoBackground stops receiving once the app leaves the screen on a
+	// phone; by default it goes on (Android: a foreground service; iOS:
+	// the short time iOS allows).
+	NoBackground bool `json:"noBackground"`
 
 	MinimizeToTray bool `json:"minimizeToTray"`
 	CloseToTray    bool `json:"closeToTray"`

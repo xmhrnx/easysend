@@ -33,8 +33,9 @@ type Config struct {
 	// Accept decides on an offered transfer, blocking until the user
 	// answers. It returns a nil Sink to decline.
 	Accept func(ctx context.Context, in Incoming) Sink
-	// OnText receives a text message (a text-only transfer).
-	OnText func(from Device, text string)
+	// OnText decides on a text message (a text-only transfer), blocking
+	// until the user answers like Accept; false declines it.
+	OnText func(ctx context.Context, from Device, text string) bool
 	// OnDevices runs after the device list changes.
 	OnDevices func()
 }

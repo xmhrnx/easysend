@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"runtime"
 	"strconv"
 
 	"github.com/xmhrnx/giode"
@@ -32,6 +33,20 @@ func (s *settingsScreen) content() giode.Element {
 	if cur.RequirePIN {
 		pinRow = settingBlock("PIN", "Tell it to people who send to you.", s.pin, 160)
 	}
+	receiving := []giode.Element{
+		settingBlock("Save files to", saveTo, giode.Row(giode.Styles{Gap: 8}, folderControls...), 220),
+		settingBlock("Accept automatically", "Save without asking from favorites (star a device) or from everyone.", s.accept, 300),
+		settingRow("Require a PIN", "Senders must type this PIN before you get a request.", s.requirePIN),
+		pinRow,
+		settingRow("Notifications", "Tell me when something arrives while EasySend isn't open.", s.notify),
+	}
+	if !platform.IsDesktop {
+		hint := "Stay reachable after you leave EasySend, with a notification showing it's ready."
+		if runtime.GOOS == "ios" {
+			hint = "Stay reachable for the short time iOS allows (about 30 seconds) after you leave EasySend."
+		}
+		receiving = append(receiving, settingRow("Keep receiving in the background", hint, s.background))
+	}
 	body := []giode.Element{
 		settingsCard("Profile & look", "sparkles",
 			settingBlock("Device name", "How you appear to nearby devices and on browser pages.", s.name, 260),
@@ -41,13 +56,7 @@ func (s *settingsScreen) content() giode.Element {
 		settingsCard("Sending", "send",
 			settingRow("Clear the list after sending", "Once files are delivered, take them off the list so the next send starts fresh.", s.clearSent),
 		),
-		settingsCard("Receiving", "inbox",
-			settingBlock("Save files to", saveTo, giode.Row(giode.Styles{Gap: 8}, folderControls...), 220),
-			settingBlock("Accept automatically", "Save without asking from favorites (star a device) or from everyone.", s.accept, 300),
-			settingRow("Require a PIN", "Senders must type this PIN before you get a request.", s.requirePIN),
-			pinRow,
-			settingRow("Notifications", "Tell me when something arrives.", s.notify),
-		),
+		settingsCard("Receiving", "inbox", receiving...),
 	}
 	if platform.IsDesktop {
 		body = append(body, settingsCard("Desktop", "monitor",

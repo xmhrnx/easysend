@@ -3,6 +3,7 @@ package ui
 
 import (
 	"bytes"
+	"gioui.org/layout"
 	"image"
 	_ "image/png" // logo decoding
 
@@ -96,15 +97,15 @@ func (u *UI) View() giode.Element {
 	safe := giode.SafeArea()
 	body := giode.Responsive(
 		giode.Breakpoint{MaxWidth: 760, Name: "compact", View: func() giode.Element {
-			u.toasts.Inset(giode.Inset{Bottom: navClearance() - 8})
 			return giode.Box(giode.Styles{Width: -1, Height: -1, Background: "theme.background"},
+				toastInset(u, navClearance()-8),
 				giode.Box(giode.Styles{Width: -1, Height: -1, Padding: giode.Inset{Top: safe.Top, Left: safe.Left, Right: safe.Right}}, page),
 				giode.Box(giode.Styles{Position: giode.PositionAbsolute, Left: prop.Left(navMargin + safe.Left), Right: prop.Right(navMargin + safe.Right), Bottom: prop.Bottom(navBottom())}, u.bottomNav),
 			)
 		}},
 		giode.Breakpoint{View: func() giode.Element {
-			u.toasts.Inset(giode.Inset{Bottom: safe.Bottom})
 			return giode.Row(giode.Styles{Width: -1, Height: -1, Background: "theme.background", Wrap: giode.WrapNoWrap, Padding: safe},
+				toastInset(u, safe.Bottom),
 				u.sidebar,
 				giode.Box(giode.Styles{FlexGrow: 1, Height: -1}, page),
 			)
@@ -136,3 +137,14 @@ func (u *UI) Go(s screen) { u.current = s }
 
 // toast shows a short message.
 func (u *UI) toast(kind giode.ToastKind, msg string) { u.toasts.Show(kind, msg) }
+
+// toastInset keeps toasts bottom dp above the window's edge. It's an
+// element, so it applies only for the layout actually drawn: Responsive
+// builds every breakpoint's view, and setting it there let the wide
+// layout's inset win on phones too, putting toasts on the tab bar.
+func toastInset(u *UI, bottom int) giode.Element {
+	return giode.RawFunc(func(gtx layout.Context) layout.Dimensions {
+		u.toasts.Inset(giode.Inset{Bottom: bottom})
+		return layout.Dimensions{}
+	})
+}

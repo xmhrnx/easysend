@@ -53,7 +53,7 @@ func TestSendFilesAndText(t *testing.T) {
 	recv := node(t, "Receiver", Config{
 		PIN:    func() string { return "4242" },
 		Accept: func(ctx context.Context, in Incoming) Sink { return sink },
-		OnText: func(from Device, text string) { gotText = text + "|" + from.Alias },
+		OnText: func(_ context.Context, from Device, text string) bool { gotText = text + "|" + from.Alias; return true },
 	})
 	send := node(t, "Sender", Config{})
 
@@ -128,5 +128,23 @@ func TestResume(t *testing.T) {
 	dev, err := send.Register(ctx, "127.0.0.1:"+strconv.Itoa(recv.Port()), true)
 	if err != nil || dev.Alias != "Receiver" {
 		t.Fatalf("register after resume: %v %+v", err, dev)
+	}
+}
+
+// TestDeclineText checks the sender learns a declined message wasn't
+// delivered.
+func TestDeclineText(t *testing.T) {
+	recv := node(t, "Receiver", Config{
+		OnText: func(context.Context, Device, string) bool { return false },
+	})
+	send := node(t, "Sender", Config{})
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	dev, err := send.Register(ctx, "127.0.0.1:"+strconv.Itoa(recv.Port()), true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := send.Send(ctx, dev, []item.Item{item.FromText("hello")}, "", SendEvents{}); err == nil {
+		t.Fatal("declined text reported as sent")
 	}
 }

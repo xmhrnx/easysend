@@ -24,8 +24,9 @@ func (n *Node) handlePrepare(w http.ResponseWriter, r *http.Request) {
 	n.addDevice(sender)
 
 	if text, ok := textMessage(req.Files); ok {
-		if n.cfg.OnText != nil {
-			n.cfg.OnText(sender, text)
+		if n.cfg.OnText == nil || !n.cfg.OnText(r.Context(), sender, text) {
+			http.Error(w, "declined", http.StatusForbidden)
+			return
 		}
 		w.WriteHeader(http.StatusNoContent)
 		return

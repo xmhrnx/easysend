@@ -65,11 +65,17 @@ func (d *incomingDialog) content() giode.Element {
 		}
 		files = append(files, d.fileRow(f.FileName, f.Size))
 	}
+	what := "wants to send you " + plural(len(r.Files), "file", "files") + " · " + item.HumanSize(r.Total)
+	if r.Text != "" {
+		// A message: show what it says, as files show their names.
+		what = "wants to send you a message"
+		files = []giode.Element{giode.Text(r.Text, giode.Styles{FontFamily: fontText, FontSize: 14, Color: "theme.text", MaxLines: 6, TextOverflow: giode.TextOverflowEllipsis})}
+	}
 	return giode.Stack(giode.Styles{Gap: 14, Width: -1, Align: giode.AlignCenter, Padding: giode.Inset{Top: 4}},
 		orb(deviceIcon(r.Sender.DeviceType), 64),
 		giode.Stack(giode.Styles{Gap: 4, Align: giode.AlignCenter},
 			giode.Text(r.Sender.Alias, giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 21, Color: "theme.text", TextAlign: giode.TextAlignCenter}),
-			giode.Text("wants to send you "+plural(len(r.Files), "file", "files")+" · "+item.HumanSize(r.Total), giode.Styles{FontFamily: fontText, FontSize: 13.5, Color: "theme.muted", TextAlign: giode.TextAlignCenter})),
+			giode.Text(what, giode.Styles{FontFamily: fontText, FontSize: 13.5, Color: "theme.muted", TextAlign: giode.TextAlignCenter})),
 		giode.Stack(giode.Styles{Gap: 10, Width: -1, Padding: giode.UniformInset(12), BorderRadius: 14, BorderWidth: 1, BorderColor: "theme.border"}, files...),
 		giode.Box(giode.Styles{Width: -1}, d.trust),
 	)

@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/url"
 	"runtime"
+	"sync/atomic"
 
 	"github.com/xmhrnx/giode"
 	"github.com/xmhrnx/giode/crash"
@@ -43,6 +44,8 @@ func main() {
 	// instance reaches; a second launch hands its files to it and exits.
 	stop := make(chan struct{})
 	discovery := &multicastLock{}
+	var inBackground atomic.Bool        // the app has left the screen (OnBackground)
+	var iosGrace atomic.Pointer[func()] // releases iOS's background time
 	var (
 		app *giode.App
 		eng *engine.Engine
@@ -69,8 +72,25 @@ func main() {
 		},
 		OnShareReceived: func(s giode.SharedContent) { u.ReceiveShare(s) },
 		OnOpenURL:       func(link *url.URL) { u.OpenLink(link) },
-		OnBackground:    discovery.stop,
+		OnBackground: func() {
+			inBackground.Store(true)
+			if u == nil || !u.ReceivesInBackground() {
+				discovery.stop()
+				return
+			}
+			// iOS gives a backgrounded app about 30 seconds; KeepAlive
+			// asks for them, so a device picked just now can still send.
+			if runtime.GOOS == "ios" {
+				if release, err := app.KeepAlive("Receiving"); err == nil {
+					iosGrace.Store(&release)
+				}
+			}
+		},
 		OnForeground: func() {
+			inBackground.Store(false)
+			if r := iosGrace.Swap(nil); r != nil {
+				(*r)()
+			}
 			discovery.start()
 			// iOS takes back a suspended app's sockets; reopen them.
 			if runtime.GOOS == "ios" && eng != nil {
@@ -94,6 +114,11 @@ func main() {
 				DeviceType:       platform.DeviceType,
 				OnChange:         app.Invalidate,
 				Notify: func(title, body string) {
+					// While the app is in front, its own sheet shows the
+					// request: a notification would only repeat it.
+					if !inBackground.Load() && app.WindowVisible() && (!platform.IsDesktop || app.Focused()) {
+						return
+					}
 					if err := app.Notify(title, body); err != nil {
 						log.Printf("notify: %v", err)
 					}

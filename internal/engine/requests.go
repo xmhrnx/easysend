@@ -11,10 +11,12 @@ import (
 
 // Request is an incoming nearby transfer waiting for the user.
 type Request struct {
-	ID       string
-	Sender   localsend.Device
-	Files    []localsend.FileMeta
-	Total    int64
+	ID     string
+	Sender localsend.Device
+	Files  []localsend.FileMeta
+	Total  int64
+	// Text is the message of a text-only request, which has no files.
+	Text     string
 	Received time.Time
 	answer   chan bool
 }
@@ -65,21 +67,28 @@ func (e *Engine) accept(ctx context.Context, in localsend.Incoming) localsend.Si
 	for _, f := range in.Files {
 		req.Total += f.Size
 	}
-	if !e.autoAccepts(in.Sender) {
-		e.mu.Lock()
-		e.requests = append(e.requests, req)
-		e.mu.Unlock()
-		e.changed()
-		e.notify(in.Sender.Alias+" wants to send you files", describeFiles(in.Files, req.Total))
-		select {
-		case ok := <-req.answer:
-			if !ok {
-				return nil
-			}
-		case <-ctx.Done():
-			e.Answer(req.ID, false)
-			return nil
-		}
+	if !e.ask(ctx, req, in.Sender.Alias+" wants to send you files", describeFiles(in.Files, req.Total)) {
+		return nil
 	}
 	return e.newSink(in)
+}
+
+// ask waits for the user to accept req (at once for senders accepted
+// automatically) and reports the answer; a sender giving up declines.
+func (e *Engine) ask(ctx context.Context, req *Request, title, body string) bool {
+	if e.autoAccepts(req.Sender) {
+		return true
+	}
+	e.mu.Lock()
+	e.requests = append(e.requests, req)
+	e.mu.Unlock()
+	e.changed()
+	e.notify(title, body)
+	select {
+	case ok := <-req.answer:
+		return ok
+	case <-ctx.Done():
+		e.Answer(req.ID, false)
+		return false
+	}
 }
