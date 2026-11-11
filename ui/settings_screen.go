@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"context"
 	"gioui.org/layout"
 	"github.com/xmhrnx/giode"
 	"github.com/xmhrnx/giode/components/input"
@@ -83,7 +84,12 @@ func newSettingsScreen(u *UI) *settingsScreen {
 	s.pin = field("PIN", cur.PIN, func(v string) { update(func(st *settings.Settings) { st.PIN = v }) })
 	s.pin.Keyboard(giode.KeyboardNumeric)
 	s.requirePIN = sw(cur.RequirePIN, func(on bool) { update(func(st *settings.Settings) { st.RequirePIN = on }) })
-	s.notify = sw(cur.Notifications, func(on bool) { update(func(st *settings.Settings) { st.Notifications = on }) })
+	s.notify = sw(cur.Notifications, func(on bool) {
+		update(func(st *settings.Settings) { st.Notifications = on })
+		if on {
+			go s.allowNotifications()
+		}
+	})
 	s.clearSent = sw(!cur.KeepAfterSend, func(on bool) { update(func(st *settings.Settings) { st.KeepAfterSend = !on }) })
 	s.background = sw(!cur.NoBackground, func(on bool) { update(func(st *settings.Settings) { st.NoBackground = !on }) })
 
@@ -117,3 +123,14 @@ func newSettingsScreen(u *UI) *settingsScreen {
 }
 
 func (s *settingsScreen) Layout(gtx layout.Context) layout.Dimensions { return s.scroll.Layout(gtx) }
+
+// allowNotifications asks for the system's permission when notifications
+// are turned on, and says how to allow them when the user said no before.
+func (s *settingsScreen) allowNotifications() {
+	ok, err := s.u.app.RequestNotificationPermission(context.Background())
+	if err == nil && !ok {
+		s.u.app.Post(func() {
+			s.u.toast(giode.ToastInfo, "Notifications are off for EasySend in the system settings")
+		})
+	}
+}

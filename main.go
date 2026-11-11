@@ -4,6 +4,7 @@
 package main
 
 import (
+	"context"
 	"image"
 	"log"
 	"net/url"
@@ -132,6 +133,12 @@ func main() {
 			u.SetupTray()
 			go u.KeepAliveWhileTransferring(stop)
 			discovery.start()
+			// Phones notify only from the background, where no permission
+			// prompt can show: ask now, while EasySend is on screen. It
+			// also lets Android show the "ready to receive" notification.
+			if !platform.IsDesktop && eng.Settings.Get().Notifications {
+				go func() { _, _ = app.RequestNotificationPermission(context.Background()) }()
+			}
 			if platform.IsDesktop && platform.Profile() == "" {
 				if err := app.InstallContextActions(); err != nil {
 					log.Printf("context menu: %v", err)
