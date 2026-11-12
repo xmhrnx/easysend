@@ -4,7 +4,6 @@ import (
 	"context"
 	"gioui.org/layout"
 	"github.com/xmhrnx/giode"
-	"github.com/xmhrnx/giode/components/dropdown"
 	"github.com/xmhrnx/giode/components/input"
 	"github.com/xmhrnx/giode/components/scroll"
 	"github.com/xmhrnx/giode/components/segmented"
@@ -23,7 +22,7 @@ type settingsScreen struct {
 	privacy        *giode.ButtonElement
 
 	name     *input.Input
-	language *dropdown.Select
+	language *giode.ButtonElement
 	theme    *segmented.Control
 	accent   *accentPicker
 
@@ -70,13 +69,7 @@ func newSettingsScreen(u *UI) *settingsScreen {
 			u.toast(giode.ToastSuccess, tr("Name updated"))
 		}
 	})
-	s.language = giode.Input.Select(giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 10, Color: "theme.text"}, languageOptions()...)
-	s.language.SetSelected(languageIndex(cur.Language))
-	s.language.OnChange(func(i int) {
-		code := languageCode(i)
-		update(func(st *settings.Settings) { st.Language = code })
-		u.SetLanguage(code)
-	})
+	s.language = softButton(languageName(cur.Language), "globe", func() { u.language.open() })
 	s.theme = giode.Input.Segmented(tr("System"), tr("Dark"), tr("Light")).OnChange(func(i int) {
 		update(func(st *settings.Settings) { st.Theme = settings.Theme(i) })
 		u.ApplyTheme()

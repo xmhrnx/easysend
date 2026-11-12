@@ -1,7 +1,6 @@
 package ui
 
 import (
-
 	"gioui.org/layout"
 	"github.com/xmhrnx/giode"
 	"github.com/xmhrnx/giode/components/segmented"

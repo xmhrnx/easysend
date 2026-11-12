@@ -18,6 +18,7 @@ func (s *settingsScreen) content() giode.Element {
 	cur := s.u.eng.Settings.Get()
 	s.syncSwitches(cur)
 	self := s.u.eng.Self()
+	s.language.Label(languageName(cur.Language))
 
 	folderControls := []giode.Element{s.openFolder}
 	if platform.IsDesktop {

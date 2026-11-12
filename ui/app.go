@@ -49,6 +49,7 @@ type UI struct {
 	pin      *pinDialog
 	compose  *composeDialog
 	address  *addressDialog
+	language *languageDialog
 	toasts   *giode.ToasterElement
 	help     *support.Support // report form, donations
 }
@@ -82,6 +83,7 @@ func (u *UI) build() {
 	u.pin = newPINDialog(u)
 	u.compose = newComposeDialog(u)
 	u.address = newAddressDialog(u)
+	u.language = newLanguageDialog(u)
 }
 
 // SetLanguage switches the interface to a language code ("" for the
@@ -106,7 +108,7 @@ func (u *UI) ApplyTheme() {
 // View is the root view, run every frame.
 func (u *UI) View() giode.Element {
 	page := u.page()
-	overlays := []giode.Element{u.incoming, u.pin, u.compose, u.address, u.help, u.toasts}
+	overlays := []giode.Element{u.incoming, u.pin, u.compose, u.address, u.language, u.help, u.toasts}
 	// The app is drawn edge to edge (Config.EdgeToEdge): the page runs
 	// under the status bar and home indicator, padded clear of them, and
 	// on phones the tab bar floats over it.
