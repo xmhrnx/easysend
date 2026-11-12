@@ -21,6 +21,7 @@ func (u *UI) KeepAliveWhileTransferring(stop <-chan struct{}) {
 	t := time.NewTicker(2 * time.Second)
 	defer t.Stop()
 	var release, ready func()
+	screenOn := false
 	for {
 		select {
 		case <-stop:
@@ -32,6 +33,20 @@ func (u *UI) KeepAliveWhileTransferring(stop <-chan struct{}) {
 			}
 			return
 		case <-t.C:
+		}
+		// iOS freezes EasySend soon after it leaves the screen - the
+		// iPhone locking itself included - and a frozen app can't serve
+		// its links: keep the screen on while a link is shared or browser
+		// uploads are on, so the other device can still reach it.
+		if runtime.GOOS == "ios" {
+			serving := len(u.eng.Shares()) > 0 || u.eng.Settings.Get().BrowserDrop
+			if serving != screenOn {
+				if err := u.app.KeepScreenOn(serving); err != nil {
+					log.Printf("keep screen on: %v", err)
+				} else {
+					screenOn = serving
+				}
+			}
 		}
 		// On Android a foreground service keeps EasySend reachable after
 		// it leaves the screen, so requests arrive (and notify) without
