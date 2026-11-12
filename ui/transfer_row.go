@@ -64,7 +64,13 @@ func (r *transferRow) Layout(gtx layout.Context) layout.Dimensions {
 		actions = append(actions, r.cancel)
 	default:
 		if engine.IsPINError(t) {
-			actions = append(actions, r.retry)
+			if giode.Compact() {
+				// On a phone, under the message: beside the chip and icons
+				// it left the text a few letters wide.
+				info = append(info, giode.Box(giode.Styles{Padding: giode.Inset{Top: 4}}, r.retry))
+			} else {
+				actions = append(actions, r.retry)
+			}
 		}
 		if t.Text != "" {
 			actions = append(actions, r.copy)
