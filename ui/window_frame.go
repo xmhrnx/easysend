@@ -25,7 +25,7 @@ func newWindowFrame(u *UI) *windowFrame {
 		variant = giode.TitleBarMac
 	}
 	f.bar = giode.TitleBar(u.app, "EasySend", giode.Styles{
-		Background: "theme.background", Color: "theme.text", Height: 40,
+		Background: "theme.background", Color: "theme.text", Height: titleBarHeight,
 		FontSize: 13, FontWeight: giode.FontWeightSemiBold,
 		BorderWidth: 1, BorderColor: "theme.border",
 	}).Variant(variant).Icon(u.logoElement(18)).
@@ -60,3 +60,6 @@ func (f *windowFrame) status() giode.Element {
 }
 
 func (f *windowFrame) Layout(gtx layout.Context) layout.Dimensions { return f.bar.Layout(gtx) }
+
+// titleBarHeight is the custom title bar's height, in dp.
+const titleBarHeight = 40

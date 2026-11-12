@@ -59,7 +59,7 @@ func New(app *giode.App, eng *engine.Engine) *UI {
 	if img, _, err := image.Decode(bytes.NewReader(assets.Logo)); err == nil {
 		u.logo = img
 	}
-	u.toasts = giode.Toaster().Placement(giode.ToastBottomCenter).Max(3)
+	u.toasts = giode.Toaster().Placement(giode.ToastTopCenter).Max(3)
 	u.help = newSupport(u)
 	if platform.IsDesktop {
 		u.frame = newWindowFrame(u)
@@ -98,14 +98,14 @@ func (u *UI) View() giode.Element {
 	body := giode.Responsive(
 		giode.Breakpoint{MaxWidth: 760, Name: "compact", View: func() giode.Element {
 			return giode.Box(giode.Styles{Width: -1, Height: -1, Background: "theme.background"},
-				toastInset(u, navClearance()-8),
+				toastInset(u, safe.Top),
 				giode.Box(giode.Styles{Width: -1, Height: -1, Padding: giode.Inset{Top: safe.Top, Left: safe.Left, Right: safe.Right}}, page),
 				giode.Box(giode.Styles{Position: giode.PositionAbsolute, Left: prop.Left(navMargin + safe.Left), Right: prop.Right(navMargin + safe.Right), Bottom: prop.Bottom(navBottom())}, u.bottomNav),
 			)
 		}},
 		giode.Breakpoint{View: func() giode.Element {
 			return giode.Row(giode.Styles{Width: -1, Height: -1, Background: "theme.background", Wrap: giode.WrapNoWrap, Padding: safe},
-				toastInset(u, safe.Bottom),
+				toastInset(u, safe.Top+u.frameHeight()),
 				u.sidebar,
 				giode.Box(giode.Styles{FlexGrow: 1, Height: -1}, page),
 			)
@@ -138,13 +138,22 @@ func (u *UI) Go(s screen) { u.current = s }
 // toast shows a short message.
 func (u *UI) toast(kind giode.ToastKind, msg string) { u.toasts.Show(kind, msg) }
 
-// toastInset keeps toasts bottom dp above the window's edge. It's an
+// toastInset keeps toasts top dp below the window's top edge: clear of
+// the status bar on phones and the title bar on desktops. It's an
 // element, so it applies only for the layout actually drawn: Responsive
-// builds every breakpoint's view, and setting it there let the wide
-// layout's inset win on phones too, putting toasts on the tab bar.
-func toastInset(u *UI, bottom int) giode.Element {
+// builds every breakpoint's view, and setting it in a view let the wide
+// layout's inset win on phones too.
+func toastInset(u *UI, top int) giode.Element {
 	return giode.RawFunc(func(gtx layout.Context) layout.Dimensions {
-		u.toasts.Inset(giode.Inset{Bottom: bottom})
+		u.toasts.Inset(giode.Inset{Top: top})
 		return layout.Dimensions{}
 	})
+}
+
+// frameHeight is the custom title bar's height on desktops, 0 elsewhere.
+func (u *UI) frameHeight() int {
+	if u.frame == nil {
+		return 0
+	}
+	return titleBarHeight
 }

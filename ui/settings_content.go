@@ -29,17 +29,19 @@ func (s *settingsScreen) content() giode.Element {
 		saveTo = "Downloads › EasySend"
 	}
 
-	var pinRow giode.Element = giode.Box(giode.Styles{Display: giode.DisplayNone})
-	if cur.RequirePIN {
-		pinRow = settingBlock("PIN", "Tell it to people who send to you.", s.pin, 160)
-	}
 	receiving := []giode.Element{
 		settingBlock("Save files to", saveTo, giode.Row(giode.Styles{Gap: 8}, folderControls...), 220),
 		settingBlock("Accept automatically", "Save without asking from favorites (star a device) or from everyone.", s.accept, 300),
 		settingRow("Require a PIN", "Senders must type this PIN before you get a request.", s.requirePIN),
-		pinRow,
-		settingRow("Notifications", "Tell me when something arrives while EasySend isn't open.", s.notify),
 	}
+	// Only while a PIN is required: a hidden row would still get a
+	// divider from the card.
+	if cur.RequirePIN {
+		receiving = append(receiving, settingBlock("PIN", "Tell it to people who send to you.", s.pin, 160))
+	}
+	receiving = append(receiving,
+		settingRow("Notifications", "Tell me when something arrives while EasySend isn't open.", s.notify),
+	)
 	if !platform.IsDesktop {
 		hint := "Stay reachable after you leave EasySend, with a notification showing it's ready."
 		if runtime.GOOS == "ios" {
