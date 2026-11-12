@@ -67,10 +67,22 @@ func (s *sidebar) Layout(gtx layout.Context) layout.Dimensions {
 			giode.Text("Share anything, anywhere", stSmall),
 		),
 	)
-	return giode.Stack(giode.Styles{Width: 252, Height: -1, Padding: giode.UniformInset(16), Gap: 4, Background: "theme.surface"},
-		append(append([]giode.Element{brand}, navs...), spacer(), s.self)...,
+	kids := append(append([]giode.Element{brand}, navs...), spacer())
+	// On short windows (a phone held sideways) the device card would be
+	// cut off; the Receive screen shows the same.
+	if gtx.Metric.PxToDp(gtx.Constraints.Max.Y) >= sidebarCardMinHeight {
+		kids = append(kids, s.self)
+	}
+	safe := giode.SafeArea()
+	return giode.Stack(giode.Styles{Width: dpW(252 + safe.Left), Height: -1, Gap: 4, Background: "theme.surface",
+		Padding: giode.Inset{Top: 16 + safe.Top, Bottom: 16 + safe.Bottom, Left: 16 + safe.Left, Right: 16}},
+		kids...,
 	).Layout(gtx)
 }
+
+// sidebarCardMinHeight is the window height, in dp, from which the
+// sidebar has room for the device card.
+const sidebarCardMinHeight = 520
 
 // logoElement renders the app icon at size dp.
 func (u *UI) logoElement(size int) giode.Element {

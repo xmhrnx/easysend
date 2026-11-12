@@ -51,9 +51,8 @@ func compactOr(phone, wide int) int {
 // sideBySide lays kids in a row on wide windows and lets them wrap onto
 // several lines on phones.
 func sideBySide(st giode.Styles, kids ...giode.Element) giode.Element {
-	st.Wrap = giode.WrapNoWrap
-	if giode.Compact() {
-		st.Wrap = giode.WrapWrap
-	}
+	// Wide windows can still be narrow (a phone held sideways, a split
+	// iPad): wrap whenever the kids don't fit rather than overflow.
+	st.Wrap = giode.WrapWrap
 	return giode.Row(st, kids...)
 }

@@ -2,6 +2,8 @@ package ui
 
 import (
 	"github.com/xmhrnx/giode"
+
+	"easysend/ui/platform"
 )
 
 func (s *sidebar) deviceCard(ps giode.PressState) giode.Element {
@@ -18,7 +20,7 @@ func (s *sidebar) deviceCard(ps giode.PressState) giode.Element {
 	return giode.Stack(giode.Styles{Width: -1, Gap: 10, Padding: giode.UniformInset(14), BorderRadius: 16, Background: giode.Color(bg)},
 		giode.Text("THIS DEVICE", stOverline),
 		giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter, Wrap: giode.WrapNoWrap},
-			orb("laptop", 34),
+			orb(deviceIcon(platform.DeviceType), 34),
 			giode.Stack(giode.Styles{Gap: 2, FlexGrow: 1},
 				giode.Text(self.Name, giode.Styles{FontFamily: fontText, FontWeight: giode.FontWeightSemiBold, FontSize: 13.5, Color: "theme.text", MaxLines: 1, TextOverflow: giode.TextOverflowEllipsis}),
 				giode.Text(self.IP, stSmall),

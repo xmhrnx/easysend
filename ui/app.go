@@ -104,10 +104,12 @@ func (u *UI) View() giode.Element {
 			)
 		}},
 		giode.Breakpoint{View: func() giode.Element {
-			return giode.Row(giode.Styles{Width: -1, Height: -1, Background: "theme.background", Wrap: giode.WrapNoWrap, Padding: safe},
+			// The sidebar runs to the window's edges, keeping its content
+			// clear of the system bars itself (see sidebar.Layout).
+			return giode.Row(giode.Styles{Width: -1, Height: -1, Background: "theme.background", Wrap: giode.WrapNoWrap},
 				toastInset(u, safe.Top+u.frameHeight()),
 				u.sidebar,
-				giode.Box(giode.Styles{FlexGrow: 1, Height: -1}, page),
+				giode.Box(giode.Styles{FlexGrow: 1, Height: -1, Padding: giode.Inset{Top: safe.Top, Right: safe.Right, Bottom: safe.Bottom}}, page),
 			)
 		}},
 	)
