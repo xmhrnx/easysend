@@ -117,7 +117,15 @@ func (u *UI) View() giode.Element {
 			u.frame,
 			giode.Box(giode.Styles{Width: -1, FlexGrow: 1}, body))
 	}
-	return giode.Stack(giode.Styles{Width: -1, Height: -1}, append([]giode.Element{main}, overlays...)...)
+	// Overlays (sheets, toasts) place themselves relative to where they
+	// sit, so each sits at the window's top-left, over the page: in the
+	// column after a full-height page they started at the bottom edge,
+	// and toasts asked to go to the top landed at the bottom.
+	kids := []giode.Element{main}
+	for _, o := range overlays {
+		kids = append(kids, giode.Box(giode.Styles{Position: giode.PositionAbsolute, Top: giode.Flush, Left: giode.Flush, Width: -1, Height: -1}, o))
+	}
+	return giode.Box(giode.Styles{Width: -1, Height: -1}, kids...)
 }
 
 func (u *UI) page() giode.Element {
