@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"errors"
+	"github.com/xmhrnx/giode/i18n"
 	"io"
 	"io/fs"
 	"os"
@@ -107,7 +108,7 @@ func (e *Engine) onReceived(t transfer.Transfer) {
 		if e.cfg.Publish != nil {
 			e.publish(t)
 		}
-		e.notify("Received from "+t.Peer, t.Title()+" · "+item.HumanSize(t.Total))
+		e.notify(i18n.Intl("Received from {name}", "name", t.Peer), t.Title()+" · "+item.HumanSize(t.Total))
 	}()
 }
 
@@ -130,7 +131,7 @@ func (e *Engine) publish(t transfer.Transfer) {
 		for _, p := range files {
 			dst, err := e.cfg.Publish(ctx, p)
 			if err != nil {
-				e.Transfers.Update(t.ID, func(t *transfer.Transfer) { t.Error = "Kept in app storage: " + err.Error() })
+				e.Transfers.Update(t.ID, func(t *transfer.Transfer) { t.Error = i18n.Intl("Kept in app storage: {error}", "error", err.Error()) })
 				continue
 			}
 			os.Remove(p)

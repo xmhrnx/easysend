@@ -4,6 +4,7 @@ import (
 	"context"
 	"gioui.org/layout"
 	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/dropdown"
 	"github.com/xmhrnx/giode/components/input"
 	"github.com/xmhrnx/giode/components/scroll"
 	"github.com/xmhrnx/giode/components/segmented"
@@ -21,9 +22,10 @@ type settingsScreen struct {
 	copyLog        *giode.ButtonElement
 	privacy        *giode.ButtonElement
 
-	name   *input.Input
-	theme  *segmented.Control
-	accent *accentPicker
+	name     *input.Input
+	language *dropdown.Select
+	theme    *segmented.Control
+	accent   *accentPicker
 
 	folder     *giode.ButtonElement
 	openFolder *giode.ButtonElement
@@ -46,7 +48,7 @@ func newSettingsScreen(u *UI) *settingsScreen {
 	cur := u.eng.Settings.Get()
 	update := func(fn func(*settings.Settings)) {
 		if err := u.eng.UpdateSettings(fn); err != nil {
-			u.toast(giode.ToastError, "Couldn't save settings: "+err.Error())
+			u.toast(giode.ToastError, tr("Couldn't save settings: {error}", "error", err.Error()))
 		}
 	}
 	field := func(placeholder, value string, save func(string)) *input.Input {
@@ -62,27 +64,34 @@ func newSettingsScreen(u *UI) *settingsScreen {
 		return t
 	}
 
-	s.name = field("Device name", cur.DeviceName, func(v string) {
+	s.name = field(tr("Device name"), cur.DeviceName, func(v string) {
 		if v != "" && v != u.eng.Settings.Get().DeviceName {
 			update(func(st *settings.Settings) { st.DeviceName = v })
-			u.toast(giode.ToastSuccess, "Name updated")
+			u.toast(giode.ToastSuccess, tr("Name updated"))
 		}
 	})
-	s.theme = giode.Input.Segmented("System", "Dark", "Light").OnChange(func(i int) {
+	s.language = giode.Input.Select(giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 10, Color: "theme.text"}, languageOptions()...)
+	s.language.SetSelected(languageIndex(cur.Language))
+	s.language.OnChange(func(i int) {
+		code := languageCode(i)
+		update(func(st *settings.Settings) { st.Language = code })
+		u.SetLanguage(code)
+	})
+	s.theme = giode.Input.Segmented(tr("System"), tr("Dark"), tr("Light")).OnChange(func(i int) {
 		update(func(st *settings.Settings) { st.Theme = settings.Theme(i) })
 		u.ApplyTheme()
 	})
 	s.theme.SetSelected(int(cur.Theme))
 	s.theme.Styles(giode.Styles{Width: -1})
 
-	s.folder = softButton("Change…", "folder", s.pickFolder)
-	s.openFolder = softButton("Open", "external", u.openReceivedFolder)
-	s.accept = giode.Input.Segmented("Ask", "Favorites", "Everyone").OnChange(func(i int) {
+	s.folder = softButton(tr("Change…"), "folder", s.pickFolder)
+	s.openFolder = softButton(tr("Open"), "external", u.openReceivedFolder)
+	s.accept = giode.Input.Segmented(tr("Ask"), tr("Favorites"), tr("Everyone")).OnChange(func(i int) {
 		update(func(st *settings.Settings) { st.AutoAccept = settings.AutoAccept(i) })
 	})
 	s.accept.SetSelected(int(cur.AutoAccept))
 	s.accept.Styles(giode.Styles{Width: -1})
-	s.pin = field("PIN", cur.PIN, func(v string) { update(func(st *settings.Settings) { st.PIN = v }) })
+	s.pin = field(tr("PIN"), cur.PIN, func(v string) { update(func(st *settings.Settings) { st.PIN = v }) })
 	s.pin.Keyboard(giode.KeyboardNumeric)
 	s.requirePIN = sw(cur.RequirePIN, func(on bool) { update(func(st *settings.Settings) { st.RequirePIN = on }) })
 	s.notify = sw(cur.Notifications, func(on bool) {
@@ -96,7 +105,7 @@ func newSettingsScreen(u *UI) *settingsScreen {
 
 	s.login = sw(u.app.LaunchAtLogin(), func(on bool) {
 		if err := u.app.SetLaunchAtLogin(on); err != nil {
-			u.toast(giode.ToastError, "Couldn't change start at login: "+err.Error())
+			u.toast(giode.ToastError, tr("Couldn't change start at login: {error}", "error", err.Error()))
 			s.login.SetChecked(u.app.LaunchAtLogin())
 		}
 	})
@@ -113,16 +122,16 @@ func newSettingsScreen(u *UI) *settingsScreen {
 	s.discoverable = sw(cur.Discoverable, func(on bool) { update(func(st *settings.Settings) { st.Discoverable = on }) })
 	s.upnp = sw(cur.UPnP, func(on bool) { update(func(st *settings.Settings) { st.UPnP = on }) })
 	s.publicURL = field("https://files.example.com", cur.PublicURL, func(v string) { update(func(st *settings.Settings) { st.PublicURL = v }) })
-	s.rendezvous = field("Default (relay.magic-wormhole.io)", cur.RendezvousURL, func(v string) { update(func(st *settings.Settings) { st.RendezvousURL = v }) })
-	s.relay = field("Default (transit.magic-wormhole.io)", cur.TransitRelay, func(v string) { update(func(st *settings.Settings) { st.TransitRelay = v }) })
+	s.rendezvous = field(tr("Default ({host})", "host", "relay.magic-wormhole.io"), cur.RendezvousURL, func(v string) { update(func(st *settings.Settings) { st.RendezvousURL = v }) })
+	s.relay = field(tr("Default ({host})", "host", "transit.magic-wormhole.io"), cur.TransitRelay, func(v string) { update(func(st *settings.Settings) { st.TransitRelay = v }) })
 
-	s.report = softButton("Report…", "report", u.help.Report)
-	s.donate = primaryButton("Donate", "heart", u.help.Donate)
-	s.copyLog = softButton("Copy", "copy", func() {
+	s.report = softButton(tr("Report…"), "report", u.help.Report)
+	s.donate = primaryButton(tr("Donate"), "heart", u.help.Donate)
+	s.copyLog = softButton(tr("Copy"), "copy", func() {
 		u.app.SetClipboard(u.networkLog())
-		u.toast(giode.ToastSuccess, "Networking log copied")
+		u.toast(giode.ToastSuccess, tr("Networking log copied"))
 	})
-	s.privacy = softButton("Privacy policy", "shield", u.openPrivacyPolicy)
+	s.privacy = softButton(tr("Privacy policy"), "shield", u.openPrivacyPolicy)
 	s.scroll = giode.Scroll(s.content, scrollStyles)
 	return s
 }
@@ -135,7 +144,7 @@ func (s *settingsScreen) allowNotifications() {
 	ok, err := s.u.app.RequestNotificationPermission(context.Background())
 	if err == nil && !ok {
 		s.u.app.Post(func() {
-			s.u.toast(giode.ToastInfo, "Notifications are off for EasySend in the system settings")
+			s.u.toast(giode.ToastInfo, tr("Notifications are off for EasySend in the system settings"))
 		})
 	}
 }

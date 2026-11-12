@@ -16,18 +16,18 @@ type selectionPanel struct {
 const selectionShown = 6
 
 func newSelectionPanel(u *UI) *selectionPanel {
-	return &selectionPanel{u: u, clear: giode.Button("Clear", giode.Styles{Color: "theme.muted", Background: colSurface3, BorderRadius: 10, FontSize: 13, Padding: giode.SymmetricInset(12, 6)}).
+	return &selectionPanel{u: u, clear: giode.Button(tr("Clear"), giode.Styles{Color: "theme.muted", Background: colSurface3, BorderRadius: 10, FontSize: 13, Padding: giode.SymmetricInset(12, 6)}).
 		Variant(giode.VariantGhost).OnClick(u.clearItems)}
 }
 
 func (p *selectionPanel) Layout(gtx layout.Context) layout.Dimensions {
 	items := p.u.items
 	rows := []giode.Element{
-		sectionTitle(plural(len(items), "item", "items")+" · "+item.HumanSize(item.TotalSize(items)), p.clear),
+		sectionTitle(count("items", len(items))+" · "+item.HumanSize(item.TotalSize(items)), p.clear),
 	}
 	for i, it := range items {
 		if i == selectionShown {
-			rows = append(rows, giode.Text("+ "+plural(len(items)-selectionShown, "more item", "more items"), stMuted))
+			rows = append(rows, giode.Text(count("more_items", len(items)-selectionShown), stMuted))
 			break
 		}
 		rows = append(rows, p.row(it))

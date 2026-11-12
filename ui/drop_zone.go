@@ -34,16 +34,16 @@ func newDropZone(u *UI) *dropZone {
 	}
 	if !platform.IsDesktop {
 		// On phones most of what people send lives in the photo library.
-		add("Photos", "image", true, u.pickMedia)
-		add("Files", "file", false, u.pickFiles)
+		add(tr("Photos"), "image", true, u.pickMedia)
+		add(tr("Files"), "file", false, u.pickFiles)
 	} else {
-		add("Files", "file", true, u.pickFiles)
+		add(tr("Files"), "file", true, u.pickFiles)
 	}
 	if platform.IsDesktop {
-		add("Folder", "folder", false, u.pickFolder)
+		add(tr("Folder"), "folder", false, u.pickFolder)
 	}
-	add("Text", "text", false, func() { u.compose.open() })
-	add("Paste", "clipboard", false, u.pasteText)
+	add(tr("Text"), "text", false, func() { u.compose.open() })
+	add(tr("Paste"), "clipboard", false, u.pasteText)
 	return d
 }
 

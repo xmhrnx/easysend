@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/xmhrnx/giode/i18n"
 
 	"easysend/internal/transfer"
 	"easysend/internal/wormhole"
@@ -28,11 +29,11 @@ func (e *Engine) ReceiveInternet(code string) string {
 			}
 			e.Transfers.Update(id, func(t *transfer.Transfer) {
 				t.Text = text
-				t.Files = []transfer.File{{Name: "Text message", Size: int64(len(text))}}
+				t.Files = []transfer.File{{Name: i18n.Intl("Text message"), Size: int64(len(text))}}
 				t.Total = int64(len(text))
 			})
 			e.Transfers.Finish(id, transfer.Done, nil)
-			e.notify("Message received", text)
+			e.notify(i18n.Intl("Message received"), text)
 			return
 		}
 		e.Transfers.Update(id, func(t *transfer.Transfer) {

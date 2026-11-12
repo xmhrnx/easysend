@@ -32,7 +32,7 @@ func newAccentPicker(u *UI) *accentPicker {
 			return giode.Box(giode.Styles{Padding: giode.UniformInset(3), BorderRadius: 20, BorderWidth: 2, BorderColor: giode.Color(ring)},
 				giode.Box(giode.Styles{Width: 30, Height: 30, BorderRadius: 15, BackgroundGradient: giode.Linear(135, giode.Color(ac.From), giode.Color(ac.To)),
 					Align: giode.AlignCenter, Justify: giode.JustifyCenter}, mark))
-		}).Label(ac.Name).OnClick(func(giode.ClickEvent) {
+		}).Label(tr(ac.Name)).OnClick(func(giode.ClickEvent) {
 			_ = u.eng.UpdateSettings(func(s *settings.Settings) { s.Accent = i })
 			u.ApplyTheme()
 		})

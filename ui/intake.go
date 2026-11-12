@@ -29,7 +29,7 @@ func (u *UI) AddPaths(paths []string) {
 		u.app.Post(func() {
 			u.addItems(added)
 			if firstErr != nil {
-				u.toast(giode.ToastError, "Couldn't add: "+firstErr.Error())
+				u.toast(giode.ToastError, tr("Couldn't add: {error}", "error", firstErr.Error()))
 			}
 		})
 	}()
@@ -80,7 +80,7 @@ func (u *UI) sent(items []item.Item) {
 
 // pickFiles shows the file picker and adds the chosen files.
 func (u *UI) pickFiles() {
-	u.pick("files", func(ctx context.Context) ([]giode.PickedFile, error) {
+	u.pick("noun.files", func(ctx context.Context) ([]giode.PickedFile, error) {
 		return u.app.PickFiles(ctx, giode.PickOptions{Multiple: true})
 	})
 }
@@ -88,7 +88,7 @@ func (u *UI) pickFiles() {
 // pickMedia shows the photo library (the Photos picker on iOS) and adds
 // the chosen photos and videos, as their original files.
 func (u *UI) pickMedia() {
-	u.pick("photos", func(ctx context.Context) ([]giode.PickedFile, error) {
+	u.pick("noun.photos", func(ctx context.Context) ([]giode.PickedFile, error) {
 		return u.app.PickMedia(ctx, giode.MediaOptions{})
 	})
 }
@@ -101,7 +101,9 @@ func (u *UI) pick(what string, picker func(context.Context) ([]giode.PickedFile,
 			return
 		}
 		if err != nil {
-			u.app.Post(func() { u.toast(giode.ToastError, "Couldn't open "+what+": "+err.Error()) })
+			u.app.Post(func() {
+				u.toast(giode.ToastError, tr("Couldn't open {what}: {error}", "what", tr(what), "error", err.Error()))
+			})
 			return
 		}
 		var added []item.Item
@@ -109,7 +111,9 @@ func (u *UI) pick(what string, picker func(context.Context) ([]giode.PickedFile,
 			it, err := pickedItem(f)
 			f.Close()
 			if err != nil {
-				u.app.Post(func() { u.toast(giode.ToastError, "Couldn't read "+f.Name+": "+err.Error()) })
+				u.app.Post(func() {
+					u.toast(giode.ToastError, tr("Couldn't read {name}: {error}", "name", f.Name, "error", err.Error()))
+				})
 				continue
 			}
 			added = append(added, it)
@@ -146,12 +150,12 @@ func pickedItem(f giode.PickedFile) (item.Item, error) {
 // pickFolder shows the folder picker and adds every file inside.
 func (u *UI) pickFolder() {
 	go func() {
-		dir, err := u.app.PickFolder(context.Background(), giode.FolderOptions{Title: "Choose a folder to send"})
+		dir, err := u.app.PickFolder(context.Background(), giode.FolderOptions{Title: tr("Choose a folder to send")})
 		if errors.Is(err, giode.ErrCanceled) {
 			return
 		}
 		if err != nil {
-			u.app.Post(func() { u.toast(giode.ToastError, "Couldn't open the folder: "+err.Error()) })
+			u.app.Post(func() { u.toast(giode.ToastError, tr("Couldn't open the folder: {error}", "error", err.Error())) })
 			return
 		}
 		u.AddPaths([]string{dir})
@@ -162,10 +166,10 @@ func (u *UI) pickFolder() {
 func (u *UI) pasteText() {
 	u.app.ReadClipboard(func(text string) {
 		if text == "" {
-			u.toast(giode.ToastInfo, "The clipboard has no text")
+			u.toast(giode.ToastInfo, tr("The clipboard has no text"))
 			return
 		}
 		u.addItems([]item.Item{item.FromText(text)})
-		u.toast(giode.ToastSuccess, "Added text from the clipboard")
+		u.toast(giode.ToastSuccess, tr("Added text from the clipboard"))
 	})
 }

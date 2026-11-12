@@ -3,7 +3,7 @@ package engine
 import (
 	"context"
 	"errors"
-	"strconv"
+	"github.com/xmhrnx/giode/i18n"
 	"time"
 
 	"easysend/internal/item"
@@ -143,5 +143,5 @@ func describeFiles(files []localsend.FileMeta, total int64) string {
 	if len(files) == 1 {
 		return files[0].FileName + " · " + item.HumanSize(total)
 	}
-	return strconv.Itoa(len(files)) + " files · " + item.HumanSize(total)
+	return i18n.Intl("files", "count", len(files)) + " · " + item.HumanSize(total)
 }

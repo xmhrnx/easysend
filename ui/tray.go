@@ -36,31 +36,31 @@ func (u *UI) refreshTrayMenu() {
 		}
 	}
 	items := []giode.TrayItem{
-		giode.TrayAction("Open EasySend", u.app.ShowWindow),
+		giode.TrayAction(tr("Open EasySend"), u.app.ShowWindow),
 		giode.TraySeparator(),
-		giode.TrayAction("Send files…", func() {
+		giode.TrayAction(tr("Send files…"), func() {
 			show(screenSend)()
 			u.pickFiles()
 		}),
-		giode.TrayAction("Send clipboard text", func() {
+		giode.TrayAction(tr("Send clipboard text"), func() {
 			show(screenSend)()
 			u.pasteText()
 		}),
-		giode.TrayAction("Receive…", show(screenReceive)),
-		giode.TrayAction("Activity", show(screenActivity)),
+		giode.TrayAction(tr("Receive…"), show(screenReceive)),
+		giode.TrayAction(tr("Activity"), show(screenActivity)),
 		giode.TraySeparator(),
-		giode.TrayCheckbox("Visible to nearby devices", s.Discoverable, func() {
+		giode.TrayCheckbox(tr("Visible to nearby devices"), s.Discoverable, func() {
 			_ = u.eng.UpdateSettings(func(st *settings.Settings) { st.Discoverable = !st.Discoverable })
 			u.refreshTrayMenu()
 		}),
-		giode.TrayCheckbox("Receive from browsers", s.BrowserDrop, func() {
+		giode.TrayCheckbox(tr("Receive from browsers"), s.BrowserDrop, func() {
 			_ = u.eng.UpdateSettings(func(st *settings.Settings) { st.BrowserDrop = !st.BrowserDrop })
 			u.refreshTrayMenu()
 		}),
 		giode.TraySeparator(),
 	}
 	items = append(items, supportItems(u)...)
-	items = append(items, giode.TraySeparator(), giode.TrayAction("Quit EasySend", u.app.Quit))
+	items = append(items, giode.TraySeparator(), giode.TrayAction(tr("Quit EasySend"), u.app.Quit))
 	u.app.Tray().SetMenu(items...)
 }
 
@@ -75,10 +75,10 @@ func supportItems(u *UI) []giode.TrayItem {
 		}
 	}
 	if canReport() {
-		items = append(items, giode.TrayAction("Report a problem…", open(u.help.Report)))
+		items = append(items, giode.TrayAction(tr("Report a problem…"), open(u.help.Report)))
 	}
 	if u.help.CanDonate() {
-		items = append(items, giode.TrayAction("Support EasySend…", u.help.Donate))
+		items = append(items, giode.TrayAction(tr("Support EasySend…"), u.help.Donate))
 	}
 	return items
 }

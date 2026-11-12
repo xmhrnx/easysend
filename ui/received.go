@@ -12,15 +12,15 @@ import (
 )
 
 // showReceivedLabel names the action that shows received files.
-var showReceivedLabel = func() string {
+func showReceivedLabel() string {
 	switch {
 	case platform.ReceivesToDownloads:
-		return "Open Downloads"
+		return tr("Open Downloads")
 	case platform.IsDesktop:
-		return "Show in folder"
+		return tr("Show in folder")
 	}
-	return "Show in Files"
-}()
+	return tr("Show in Files")
+}
 
 // savedFiles lists where a transfer's files were saved.
 func savedFiles(t transfer.Transfer) []string {
@@ -53,7 +53,7 @@ func (u *UI) showReceived(t transfer.Transfer) {
 			err = u.app.OpenFolder(ctx, t.Folder)
 		}
 		if err != nil {
-			u.app.Post(func() { u.toast(giode.ToastError, "Couldn't open: "+err.Error()) })
+			u.app.Post(func() { u.toast(giode.ToastError, tr("Couldn't open: {error}", "error", err.Error())) })
 		}
 	}()
 }
@@ -72,7 +72,7 @@ func (u *UI) openReceivedFolder() {
 			}
 		}
 		if err != nil {
-			u.app.Post(func() { u.toast(giode.ToastError, "Couldn't open the folder: "+err.Error()) })
+			u.app.Post(func() { u.toast(giode.ToastError, tr("Couldn't open the folder: {error}", "error", err.Error())) })
 		}
 	}()
 }

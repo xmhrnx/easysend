@@ -44,6 +44,11 @@ func LoadFonts() error {
 			all = append(all, p)
 		}
 	}
+	scripts, err := scriptFaces()
+	if err != nil {
+		return err
+	}
+	all = append(all, scripts...)
 	all = append(all, gofont.Collection()...)
 	giode.RegisterFonts(all)
 	return nil

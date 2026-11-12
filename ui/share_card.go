@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"strconv"
 
 	"gioui.org/layout"
 	"github.com/xmhrnx/giode"
@@ -21,11 +20,11 @@ type shareCard struct {
 }
 
 func (u *UI) shareCardFor(v engine.ShareView) *shareCard {
-	c := giode.Keyed("share", v.Token, func() *shareCard {
+	c := giode.Keyed(scope("share"), v.Token, func() *shareCard {
 		c := &shareCard{u: u}
-		c.where = giode.Input.Segmented("Same network", "Internet")
-		c.copy = softButton("Copy link", "copy", func() { u.copy(c.url(), "Link") })
-		c.stop = dangerButton("Stop sharing", "x", func() { u.eng.StopShare(c.v.Token) })
+		c.where = giode.Input.Segmented(tr("Same network"), tr("Internet"))
+		c.copy = softButton(tr("Copy link"), "copy", func() { u.copy(c.url(), tr("Link")) })
+		c.stop = dangerButton(tr("Stop sharing"), "x", func() { u.eng.StopShare(c.v.Token) })
 		return c
 	})
 	c.v = v
@@ -41,28 +40,28 @@ func (c *shareCard) url() string {
 
 func (c *shareCard) details() string {
 	v := c.v
-	s := plural(len(v.Items), "item", "items") + " · " + item.HumanSize(v.Size())
+	s := count("items", len(v.Items)) + " · " + item.HumanSize(v.Size())
 	if v.MaxDownloads > 0 {
-		s += " · " + strconv.Itoa(v.Downloads) + "/" + strconv.Itoa(v.MaxDownloads) + " downloads"
+		s += " · " + tr("{done}/{max} downloads", "done", v.Downloads, "max", v.MaxDownloads)
 	} else {
-		s += " · " + plural(v.Downloads, "download", "downloads")
+		s += " · " + count("downloads", v.Downloads)
 	}
 	if !v.Expires.IsZero() {
-		s += " · until " + v.Expires.Format("Jan 2 15:04")
+		s += tr(" · until {when}", "when", dateTime(v.Expires))
 	}
 	return s
 }
 
 func (c *shareCard) Layout(gtx layout.Context) layout.Dimensions {
 	v := c.v
-	status := chip("Live", "theme.success")
+	status := chip(tr("Live"), "theme.success")
 	if v.Expired() {
-		status = chip("Ended", "theme.muted")
+		status = chip(tr("Ended"), "theme.muted")
 	}
 	left := []giode.Element{
 		giode.Row(giode.Styles{Gap: 8, Align: giode.AlignCenter}, status, func() giode.Element {
 			if v.PIN != "" {
-				return chip("PIN "+v.PIN, "theme.warning")
+				return chip(tr("PIN {pin}", "pin", v.PIN), "theme.warning")
 			}
 			return giode.Box(giode.Styles{})
 		}()),

@@ -8,13 +8,13 @@ import (
 )
 
 func (p *selectionPanel) row(it item.Item) giode.Element {
-	remove := giode.Keyed("sel-remove", it.ID, func() *iconbutton.Button {
+	remove := giode.Keyed(scope("sel-remove"), it.ID, func() *iconbutton.Button {
 		id := it.ID
-		return iconAction("x", "Remove", func() { p.u.removeItem(id) })
+		return iconAction("x", tr("Remove"), func() { p.u.removeItem(id) })
 	})
 	name, sub, ic := it.Name, item.HumanSize(it.Size), fileIcon(it.Name)
 	if it.Kind == item.Text {
-		name, sub, ic = firstLine(it.Text, 60), "Text · "+item.HumanSize(it.Size), "text"
+		name, sub, ic = firstLine(it.Text, 60), tr("Text · {size}", "size", item.HumanSize(it.Size)), "text"
 	}
 	return giode.Row(giode.Styles{Width: -1, Gap: 12, Align: giode.AlignCenter, Wrap: giode.WrapNoWrap},
 		tile(ic, 40, "theme.accent"),

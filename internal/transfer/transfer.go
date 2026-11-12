@@ -1,8 +1,8 @@
 package transfer
 
 import (
+	"github.com/xmhrnx/giode/i18n"
 	"path/filepath"
-	"strconv"
 	"time"
 )
 
@@ -33,11 +33,11 @@ func (t Transfer) ETA() time.Duration {
 func (t Transfer) Title() string {
 	switch {
 	case t.Text != "" && len(t.Files) <= 1:
-		return "Text message"
+		return i18n.Intl("Text message")
 	case len(t.Files) == 1:
 		return filepath.Base(t.Files[0].Name)
 	case len(t.Files) == 0:
-		return "Transfer"
+		return i18n.Intl("Transfer")
 	}
-	return strconv.Itoa(len(t.Files)) + " files"
+	return i18n.Intl("files", "count", len(t.Files))
 }

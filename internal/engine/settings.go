@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"errors"
+	"github.com/xmhrnx/giode/i18n"
 
 	"easysend/internal/localsend"
 	"easysend/internal/settings"
@@ -29,13 +30,13 @@ func errorText(err error) string {
 	case err == nil:
 		return ""
 	case errors.Is(err, localsend.ErrPINRequired):
-		return "PIN required"
+		return i18n.Intl("PIN required")
 	case errors.Is(err, localsend.ErrDeclined):
-		return "Declined by the receiver"
+		return i18n.Intl("Declined by the receiver")
 	case errors.Is(err, localsend.ErrBusy):
-		return "The receiver is busy"
+		return i18n.Intl("The receiver is busy")
 	case errors.Is(err, context.DeadlineExceeded):
-		return "Timed out"
+		return i18n.Intl("Timed out")
 	}
 	return err.Error()
 }

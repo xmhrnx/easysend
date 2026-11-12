@@ -30,6 +30,9 @@ type Settings struct {
 	Fingerprint string `json:"fingerprint"`
 	Theme       Theme  `json:"theme"`
 	Accent      int    `json:"accent"`
+	// Language is the interface language code ("ka", "he"); empty follows
+	// the system.
+	Language string `json:"language"`
 
 	DownloadDir   string     `json:"downloadDir"`
 	AutoAccept    AutoAccept `json:"autoAccept"`

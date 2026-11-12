@@ -32,10 +32,10 @@ type pinDialog struct {
 
 func newPINDialog(u *UI) *pinDialog {
 	d := &pinDialog{u: u, sends: map[string]pendingSend{}, shown: map[string]bool{}}
-	d.input = giode.Input.Text("PIN", giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 12, Color: "theme.text", FontSize: 20}).
+	d.input = giode.Input.Text(tr("PIN"), giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 12, Color: "theme.text", FontSize: 20}).
 		Keyboard(giode.KeyboardNumeric).Submit(func(string) { d.submit() })
-	d.send = sheetPrimary("Send", "send", d.submit)
-	d.cancel = sheetSecondary("Cancel", func() { d.open = false })
+	d.send = sheetPrimary(tr("Send"), "send", d.submit)
+	d.cancel = sheetSecondary(tr("Cancel"), func() { d.open = false })
 	d.sheet = newSheet(&d.open, "", d.content, func() giode.Element { return sheetActions(d.cancel, d.send) })
 	return d
 }
@@ -69,8 +69,8 @@ func (d *pinDialog) submit() {
 func (d *pinDialog) content() giode.Element {
 	return giode.Stack(giode.Styles{Gap: 14, Width: -1, Align: giode.AlignCenter},
 		orb("lock", 60),
-		giode.Text("PIN required", giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 22, Color: "theme.text"}),
-		giode.Text(d.current.peer.Alias+" asks for a PIN. It's shown in their settings.", giode.Styles{FontFamily: fontText, FontSize: 13.5, Color: "theme.muted", TextAlign: giode.TextAlignCenter}),
+		giode.Text(tr("PIN required"), giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 22, Color: "theme.text"}),
+		giode.Text(tr("{name} asks for a PIN. It's shown in their settings.", "name", d.current.peer.Alias), giode.Styles{FontFamily: fontText, FontSize: 13.5, Color: "theme.muted", TextAlign: giode.TextAlignCenter}),
 		d.input,
 	)
 }

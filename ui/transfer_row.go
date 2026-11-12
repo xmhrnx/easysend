@@ -18,16 +18,16 @@ type transferRow struct {
 }
 
 func (u *UI) transferRowFor(t transfer.Transfer) *transferRow {
-	r := giode.Keyed("transfer", t.ID, func() *transferRow {
+	r := giode.Keyed(scope("transfer"), t.ID, func() *transferRow {
 		r := &transferRow{u: u}
-		r.cancel = iconAction("x", "Cancel", func() { u.eng.Transfers.Cancel(r.t.ID) })
-		r.open = iconAction("folder", showReceivedLabel, func() { u.showReceived(r.t) })
-		r.copy = iconAction("copy", "Copy text", func() { u.copy(r.t.Text, "Text") })
-		r.remove = iconAction("trash", "Remove from history", func() {
+		r.cancel = iconAction("x", tr("Cancel"), func() { u.eng.Transfers.Cancel(r.t.ID) })
+		r.open = iconAction("folder", showReceivedLabel(), func() { u.showReceived(r.t) })
+		r.copy = iconAction("copy", tr("Copy text"), func() { u.copy(r.t.Text, tr("Text")) })
+		r.remove = iconAction("trash", tr("Remove from history"), func() {
 			id := r.t.ID
 			giode.AfterLayout(func() { u.eng.Transfers.Remove(id) })
 		})
-		r.retry = softButton("Enter PIN", "lock", func() { u.pin.reopen(r.t) })
+		r.retry = softButton(tr("Enter PIN"), "lock", func() { u.pin.reopen(r.t) })
 		return r
 	})
 	r.t = t
@@ -37,16 +37,16 @@ func (u *UI) transferRowFor(t transfer.Transfer) *transferRow {
 func (r *transferRow) Layout(gtx layout.Context) layout.Dimensions {
 	t := r.t
 	dirIcon, fg := "upload", "theme.primary"
-	verb := "to "
+	verb := tr("to {name}", "name", t.Peer)
 	if t.Direction == transfer.Incoming {
-		dirIcon, fg, verb = "download", "theme.primary", "from "
+		dirIcon, fg, verb = "download", "theme.primary", tr("from {name}", "name", t.Peer)
 	}
 	if t.Text != "" {
 		dirIcon = "message"
 	}
-	sub := verb + t.Peer + " · " + methodLabel(t.Method) + " · " + timeAgo(t.Started)
+	sub := verb + " · " + methodLabel(t.Method) + " · " + timeAgo(t.Started)
 	info := []giode.Element{
-		giode.Text(t.Title(), giode.Styles{FontFamily: fontText, FontWeight: giode.FontWeightSemiBold, FontSize: 14.5, Color: "theme.text", MaxLines: 1, TextOverflow: giode.TextOverflowEllipsis}),
+		giode.Text(titleOf(t), giode.Styles{FontFamily: fontText, FontWeight: giode.FontWeightSemiBold, FontSize: 14.5, Color: "theme.text", MaxLines: 1, TextOverflow: giode.TextOverflowEllipsis}),
 		giode.Text(sub, stSmall),
 	}
 	if t.Text != "" && t.Direction == transfer.Incoming {

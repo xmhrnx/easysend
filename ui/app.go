@@ -60,6 +60,14 @@ func New(app *giode.App, eng *engine.Engine) *UI {
 		u.logo = img
 	}
 	u.toasts = giode.Toaster().Placement(giode.ToastTopCenter).Max(3)
+	u.build()
+	u.ApplyTheme()
+	return u
+}
+
+// build creates the screens and dialogs. Their labels are fixed when
+// they are created, so changing the language builds them again.
+func (u *UI) build() {
 	u.help = newSupport(u)
 	if platform.IsDesktop {
 		u.frame = newWindowFrame(u)
@@ -74,8 +82,16 @@ func New(app *giode.App, eng *engine.Engine) *UI {
 	u.pin = newPINDialog(u)
 	u.compose = newComposeDialog(u)
 	u.address = newAddressDialog(u)
-	u.ApplyTheme()
-	return u
+}
+
+// SetLanguage switches the interface to a language code ("" for the
+// system's) and builds the labels again.
+func (u *UI) SetLanguage(code string) {
+	ApplyLanguage(code)
+	giode.AfterLayout(func() {
+		u.build()
+		u.refreshTrayMenu()
+	})
 }
 
 // ApplyTheme applies the theme settings.

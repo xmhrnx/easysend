@@ -54,7 +54,7 @@ func (u *UI) KeepAliveWhileTransferring(stop <-chan struct{}) {
 		want := runtime.GOOS == "android" && u.ReceivesInBackground()
 		switch {
 		case want && ready == nil:
-			r, err := u.app.KeepAlive("Ready to receive from nearby devices")
+			r, err := u.app.KeepAlive(tr("Ready to receive from nearby devices"))
 			if err != nil {
 				log.Printf("keep alive: %v", err)
 			} else {
@@ -73,7 +73,7 @@ func (u *UI) KeepAliveWhileTransferring(stop <-chan struct{}) {
 		}
 		switch {
 		case active && release == nil:
-			r, err := u.app.KeepAlive("Transferring files")
+			r, err := u.app.KeepAlive(tr("Transferring files"))
 			if err != nil {
 				log.Printf("keep alive: %v", err)
 				continue

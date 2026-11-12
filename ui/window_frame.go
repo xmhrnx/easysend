@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"strconv"
 
 	"gioui.org/layout"
 	"github.com/xmhrnx/giode"
@@ -44,14 +43,14 @@ func (f *windowFrame) status() giode.Element {
 			active++
 		}
 	}
-	dot, label := "theme.success", "Visible nearby"
+	dot, label := "theme.success", tr("Visible nearby")
 	switch {
 	case active > 0:
-		dot, label = "theme.primary", plural(active, "transfer", "transfers")+" in progress"
+		dot, label = "theme.primary", count("transfers_in_progress", active)
 	case len(f.u.eng.Requests()) > 0:
-		dot, label = "theme.primary", strconv.Itoa(len(f.u.eng.Requests()))+" waiting for you"
+		dot, label = "theme.primary", count("waiting_for_you", len(f.u.eng.Requests()))
 	case !f.u.eng.Settings.Get().Discoverable:
-		dot, label = "theme.muted", "Hidden"
+		dot, label = "theme.muted", tr("Hidden")
 	}
 	return giode.Row(giode.Styles{Gap: 6, Align: giode.AlignCenter, Padding: giode.SymmetricInset(10, 3), BorderRadius: 99, BorderWidth: 1, BorderColor: "theme.border"},
 		giode.Box(giode.Styles{Width: 6, Height: 6, BorderRadius: 3, Background: giode.Color(dot)}),

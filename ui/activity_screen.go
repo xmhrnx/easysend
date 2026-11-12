@@ -19,9 +19,9 @@ type activityScreen struct {
 
 func newActivityScreen(u *UI) *activityScreen {
 	a := &activityScreen{u: u}
-	a.filter = giode.Input.Segmented("All", "Sent", "Received")
+	a.filter = giode.Input.Segmented(tr("All"), tr("Sent"), tr("Received"))
 	a.filter.Styles(giode.Styles{Width: -1})
-	a.clear = softButton("Clear history", "trash", func() { giode.AfterLayout(u.eng.Transfers.ClearFinished) })
+	a.clear = softButton(tr("Clear history"), "trash", func() { giode.AfterLayout(u.eng.Transfers.ClearFinished) })
 	a.scroll = giode.Scroll(a.content, scrollStyles)
 	return a
 }
@@ -50,21 +50,21 @@ func (a *activityScreen) content() giode.Element {
 	}
 	body := []giode.Element{a.filter}
 	if len(active) > 0 {
-		body = append(body, sectionTitle("In progress"))
+		body = append(body, sectionTitle(tr("In progress")))
 		body = append(body, active...)
 	}
 	if len(done) > 0 {
-		body = append(body, sectionTitle("History", a.clear))
+		body = append(body, sectionTitle(tr("History"), a.clear))
 		body = append(body, done...)
 	}
 	if len(active)+len(done) == 0 {
 		body = append(body, card(giode.Styles{Align: giode.AlignCenter, Padding: giode.UniformInset(40), Gap: 10},
 			orb("history", 64),
-			giode.Text("Nothing here yet", stHeading),
-			giode.Text("Transfers you send and receive show up here, with their progress.", stMuted),
+			giode.Text(tr("Nothing here yet"), stHeading),
+			giode.Text(tr("Transfers you send and receive show up here, with their progress."), stMuted),
 		))
 	}
-	return pageFrame("Activity", "Every transfer, live and past.", nil, body...)
+	return pageFrame(tr("Activity"), tr("Every transfer, live and past."), nil, body...)
 }
 
 func (a *activityScreen) Layout(gtx layout.Context) layout.Dimensions { return a.scroll.Layout(gtx) }

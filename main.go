@@ -17,6 +17,7 @@ import (
 	"easysend/assets"
 	"easysend/internal/engine"
 	"easysend/internal/settings"
+	"easysend/locales"
 	"easysend/ui"
 	"easysend/ui/platform"
 )
@@ -36,6 +37,7 @@ func main() {
 		log.Printf("settings: %v", err)
 	}
 	s := prefs.Get()
+	ui.ApplyLanguage(s.Language)
 	startInTray := giode.StartInTrayAtLogin
 	if s.StartHidden {
 		startInTray = giode.StartInTrayAlways
@@ -54,6 +56,7 @@ func main() {
 	)
 	app = giode.New(giode.Config{
 		Title:          "EasySend",
+		Intl:           &giode.IntlOptions{FS: locales.FS, Dir: ".", Fallback: "en"},
 		Size:           image.Pt(1180, 800),
 		MinSize:        image.Pt(380, 560),
 		Resizable:      true,
@@ -82,7 +85,7 @@ func main() {
 			// iOS gives a backgrounded app about 30 seconds; KeepAlive
 			// asks for them, so a device picked just now can still send.
 			if runtime.GOOS == "ios" {
-				if release, err := app.KeepAlive("Receiving"); err == nil {
+				if release, err := app.KeepAlive(giode.Intl("Receiving")); err == nil {
 					iosGrace.Store(&release)
 				}
 			}
@@ -99,7 +102,7 @@ func main() {
 			}
 		},
 		ContextActions: []giode.ContextAction{
-			{ID: "send", Label: "Send with EasySend", Files: true, Folders: true},
+			{ID: "send", Label: giode.Intl("Send with EasySend"), Files: true, Folders: true},
 		},
 		OnContextAction:     func(_ string, paths []string) { u.AddPaths(paths) },
 		OnFileDrop:          func(paths []string) { u.AddPaths(paths) },

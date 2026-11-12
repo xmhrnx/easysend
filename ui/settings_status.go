@@ -12,13 +12,13 @@ func (s *settingsScreen) upnpStatus() string {
 	st := s.u.eng.Public()
 	switch st.State {
 	case engine.PublicReady:
-		return "Working: reachable at " + st.IP + ":" + strconv.Itoa(st.Port) + " (UPnP)."
+		return tr("Working: reachable at {address} (UPnP).", "address", st.IP+":"+strconv.Itoa(st.Port))
 	case engine.PublicWorking:
-		return "Asking your router…"
+		return tr("Asking your router…")
 	case engine.PublicUnavailable:
-		return st.Err
+		return tr(st.Err)
 	}
-	return "Asks your router (UPnP) to open a port so links work from anywhere."
+	return tr("Asks your router (UPnP) to open a port so links work from anywhere.")
 }
 
 func version() string {

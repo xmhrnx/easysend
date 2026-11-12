@@ -50,24 +50,24 @@ func canReport() bool { return reportURL != "" }
 // donateText describes donating the way this install takes donations.
 func donateText() string {
 	if store.BillingRequired() {
-		return "EasySend is free. If it helps you, leave a tip — it unlocks nothing, it just says thanks."
+		return tr("EasySend is free. If it helps you, leave a tip — it unlocks nothing, it just says thanks.")
 	}
-	return "EasySend is free. If it helps you, buy me a coffee on Ko-fi."
+	return tr("EasySend is free. If it helps you, buy me a coffee on Ko-fi.")
 }
 
 // supportCard is the Help & support section of Settings.
 func (s *settingsScreen) supportCard() giode.Element {
 	var rows []giode.Element
 	if canReport() {
-		rows = append(rows, settingRow("Report a problem", "Something not working? Tell us — no account needed.", s.report))
+		rows = append(rows, settingRow(tr("Report a problem"), tr("Something not working? Tell us — no account needed."), s.report))
 	}
 	if s.u.help.CanDonate() {
-		rows = append(rows, settingRow("Support EasySend", donateText(), s.donate))
+		rows = append(rows, settingRow(tr("Support EasySend"), donateText(), s.donate))
 	}
 	// The log a report would attach, for pasting anywhere: addresses,
 	// ports and what the networking did, with link tokens hidden.
-	rows = append(rows, settingRow("Networking log", "Copy what EasySend's networking did recently, to share when something doesn't connect.", s.copyLog))
-	return settingsCard("Help & support", "heart", rows...)
+	rows = append(rows, settingRow(tr("Networking log"), tr("Copy what EasySend's networking did recently, to share when something doesn't connect."), s.copyLog))
+	return settingsCard(tr("Help & support"), "heart", rows...)
 }
 
 // networkLog is what "Include recent logs" attaches to a report: this
@@ -82,7 +82,9 @@ func (u *UI) networkLog() string {
 func (u *UI) openPrivacyPolicy() {
 	go func() {
 		if err := u.app.OpenURL(context.Background(), privacyURL); err != nil {
-			u.app.Post(func() { u.toast(giode.ToastError, "Couldn't open the privacy policy: "+err.Error()) })
+			u.app.Post(func() {
+				u.toast(giode.ToastError, tr("Couldn't open the privacy policy: {error}", "error", err.Error()))
+			})
 		}
 	}()
 }

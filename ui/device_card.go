@@ -20,13 +20,13 @@ func newDeviceCard(u *UI) *deviceCard {
 	c := &deviceCard{u: u}
 	c.press = giode.Pressable(c.content).OnClick(func(giode.ClickEvent) { u.sendTo(c.peer) })
 	c.star = giode.IconButton(icon("star", 18, "theme.muted"), giode.Styles{BorderRadius: 10}).Variant(giode.IconButtonGhost).
-		Label("Favorite").OnClick(func() { u.eng.SetFavorite(c.peer.Device, !c.peer.Favorite) })
+		Label(tr("Favorite")).OnClick(func() { u.eng.SetFavorite(c.peer.Device, !c.peer.Favorite) })
 	return c
 }
 
 // deviceCardFor returns the card of a peer, keeping its state across frames.
 func (u *UI) deviceCardFor(p engine.Peer) *deviceCard {
-	c := giode.Keyed("device", p.Fingerprint, func() *deviceCard { return newDeviceCard(u) })
+	c := giode.Keyed(scope("device"), p.Fingerprint, func() *deviceCard { return newDeviceCard(u) })
 	c.peer = p
 	return c
 }
@@ -74,6 +74,6 @@ func (c *deviceCard) content(ps giode.PressState) giode.Element {
 }
 
 func (c *deviceCard) Layout(gtx layout.Context) layout.Dimensions {
-	c.press.Label("Send to " + c.peer.Alias)
+	c.press.Label(tr("Send to {name}", "name", c.peer.Alias))
 	return c.press.Layout(gtx)
 }

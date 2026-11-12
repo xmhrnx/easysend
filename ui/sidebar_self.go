@@ -13,12 +13,12 @@ func (s *sidebar) deviceCard(ps giode.PressState) giode.Element {
 	if ps.Hovered {
 		bg = colSurface3
 	}
-	status, dot := "Visible nearby", "theme.success"
+	status, dot := tr("Visible nearby"), "theme.success"
 	if !st.Discoverable {
-		status, dot = "Hidden", "theme.muted"
+		status, dot = tr("Hidden"), "theme.muted"
 	}
 	return giode.Stack(giode.Styles{Width: -1, Gap: 10, Padding: giode.UniformInset(14), BorderRadius: 16, Background: giode.Color(bg)},
-		giode.Text("THIS DEVICE", stOverline),
+		giode.Text(tr("THIS DEVICE"), stOverline),
 		giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter, Wrap: giode.WrapNoWrap},
 			orb(deviceIcon(platform.DeviceType), 34),
 			giode.Stack(giode.Styles{Gap: 2, FlexGrow: 1},

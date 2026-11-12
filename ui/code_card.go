@@ -20,10 +20,10 @@ type codeCard struct {
 }
 
 func (u *UI) codeCardFor(t transfer.Transfer) *codeCard {
-	c := giode.Keyed("code", t.ID, func() *codeCard {
+	c := giode.Keyed(scope("code"), t.ID, func() *codeCard {
 		c := &codeCard{u: u}
-		c.copy = softButton("Copy code", "copy", func() { u.copy(c.t.Code, "Code") })
-		c.cancel = iconAction("x", "Cancel", func() { u.eng.Transfers.Cancel(c.t.ID) })
+		c.copy = softButton(tr("Copy code"), "copy", func() { u.copy(c.t.Code, tr("Code")) })
+		c.cancel = iconAction("x", tr("Cancel"), func() { u.eng.Transfers.Cancel(c.t.ID) })
 		return c
 	})
 	c.t = t
@@ -32,22 +32,22 @@ func (u *UI) codeCardFor(t transfer.Transfer) *codeCard {
 
 func (c *codeCard) Layout(gtx layout.Context) layout.Dimensions {
 	t := c.t
-	head := sectionTitle(t.Title(), c.cancel)
+	head := sectionTitle(titleOf(t), c.cancel)
 	if t.Status.Finished() {
-		head = sectionTitle(t.Title(), statusChip(t))
+		head = sectionTitle(titleOf(t), statusChip(t))
 	}
 	var left []giode.Element
 	if t.Code == "" {
 		left = []giode.Element{
 			giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter},
 				giode.Spinner(giode.Styles{Width: 22, Height: 22, Color: "theme.primary"}),
-				giode.Text("Creating a code…", stStrong)),
+				giode.Text(tr("Creating a code…"), stStrong)),
 		}
 	} else {
 		left = []giode.Element{
-			giode.Text("TELL THE RECEIVER THIS CODE", stOverline),
+			giode.Text(tr("TELL THE RECEIVER THIS CODE"), stOverline),
 			giode.Text(strings.ToUpper(t.Code[:1])+t.Code[1:], giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 30, Color: "theme.primary"}),
-			giode.Text("They enter it in EasySend → Receive, the wormhole command or any Magic Wormhole app.", stMuted),
+			giode.Text(tr("They enter it in EasySend → Receive, the wormhole command or any Magic Wormhole app."), stMuted),
 			c.copy,
 		}
 	}

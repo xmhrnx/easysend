@@ -13,52 +13,52 @@ func statusText(t transfer.Transfer) string {
 	case transfer.Waiting:
 		if t.Method == transfer.Internet && t.Direction == transfer.Outgoing {
 			if t.Code == "" {
-				return "Creating code…"
+				return tr("Creating code…")
 			}
-			return "Waiting for the receiver…"
+			return tr("Waiting for the receiver…")
 		}
 		if t.Direction == transfer.Outgoing {
-			return "Waiting for " + t.Peer + " to accept…"
+			return tr("Waiting for {name} to accept…", "name", t.Peer)
 		}
-		return "Connecting…"
+		return tr("Connecting…")
 	case transfer.Active:
-		s := item.HumanSize(t.Done) + " of " + item.HumanSize(t.Total)
+		s := tr("{done} of {total}", "done", item.HumanSize(t.Done), "total", item.HumanSize(t.Total))
 		if t.Speed > 0 {
 			s += " · " + item.HumanSize(int64(t.Speed)) + "/s"
 			if eta := t.ETA(); eta > 0 {
-				s += " · " + item.HumanDuration(eta) + " left"
+				s += " · " + tr("{time} left", "time", item.HumanDuration(eta))
 			}
 		}
 		return s
 	case transfer.Done:
 		if t.Direction == transfer.Incoming {
-			return "Received · " + item.HumanSize(t.Total)
+			return tr("Received · {size}", "size", item.HumanSize(t.Total))
 		}
-		return "Sent · " + item.HumanSize(t.Total)
+		return tr("Sent · {size}", "size", item.HumanSize(t.Total))
 	case transfer.Canceled:
-		return "Canceled"
+		return tr("Canceled")
 	case transfer.Declined:
-		return "Declined"
+		return tr("Declined")
 	}
 	if t.Error != "" {
-		return t.Error
+		return tr(t.Error)
 	}
-	return "Failed"
+	return tr("Failed")
 }
 
 // statusChip is a colored label for a finished transfer.
 func statusChip(t transfer.Transfer) giode.Element {
 	switch t.Status {
 	case transfer.Done:
-		return chip("Done", "theme.success")
+		return chip(tr("Done"), "theme.success")
 	case transfer.Canceled:
-		return chip("Canceled", "theme.muted")
+		return chip(tr("Canceled"), "theme.muted")
 	case transfer.Declined:
-		return chip("Declined", "theme.warning")
+		return chip(tr("Declined"), "theme.warning")
 	case transfer.Failed:
-		return chip("Failed", "theme.danger")
+		return chip(tr("Failed"), "theme.danger")
 	}
-	return chip("In progress", "theme.primary")
+	return chip(tr("In progress"), "theme.primary")
 }
 
 // progressBar is a slim accent line.

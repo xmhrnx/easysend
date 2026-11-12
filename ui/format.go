@@ -2,7 +2,6 @@ package ui
 
 import (
 	"path"
-	"strconv"
 	"strings"
 	"time"
 
@@ -47,11 +46,11 @@ func fileIcon(name string) string {
 func methodLabel(m transfer.Method) string {
 	switch m {
 	case transfer.Internet:
-		return "Internet"
+		return tr("Internet")
 	case transfer.Browser:
-		return "Browser"
+		return tr("Browser")
 	}
-	return "Nearby"
+	return tr("Nearby")
 }
 
 func methodIcon(m transfer.Method) string {
@@ -69,20 +68,13 @@ func timeAgo(t time.Time) string {
 	d := time.Since(t)
 	switch {
 	case d < time.Minute:
-		return "just now"
+		return tr("just now")
 	case d < time.Hour:
-		return strconv.Itoa(int(d.Minutes())) + " min ago"
+		return count("minutes_ago", int(d.Minutes()))
 	case d < 24*time.Hour:
-		return strconv.Itoa(int(d.Hours())) + " h ago"
+		return count("hours_ago", int(d.Hours()))
 	case d < 7*24*time.Hour:
-		return t.Format("Mon 15:04")
+		return weekdayTime(t)
 	}
-	return t.Format("Jan 2")
-}
-
-func plural(n int, one, many string) string {
-	if n == 1 {
-		return "1 " + one
-	}
-	return strconv.Itoa(n) + " " + many
+	return monthDay(t)
 }

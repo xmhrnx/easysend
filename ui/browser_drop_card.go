@@ -19,11 +19,11 @@ type browserDropCard struct {
 
 func newBrowserDropCard(u *UI) *browserDropCard {
 	c := &browserDropCard{u: u}
-	c.on = newSwitch("Accept uploads from browsers", giode.Styles{Color: "theme.text"}).OnChange(func(on bool) {
+	c.on = newSwitch(tr("Accept uploads from browsers"), giode.Styles{Color: "theme.text"}).OnChange(func(on bool) {
 		_ = u.eng.UpdateSettings(func(s *settings.Settings) { s.BrowserDrop = on })
 	})
-	c.where = giode.Input.Segmented("Same network", "Internet")
-	c.copy = softButton("Copy link", "copy", func() { u.copy(c.url(), "Link") })
+	c.where = giode.Input.Segmented(tr("Same network"), tr("Internet"))
+	c.copy = softButton(tr("Copy link"), "copy", func() { u.copy(c.url(), tr("Link")) })
 	return c
 }
 
@@ -39,8 +39,8 @@ func (c *browserDropCard) Layout(gtx layout.Context) layout.Dimensions {
 	s := c.u.eng.Settings.Get()
 	c.on.SetChecked(s.BrowserDrop)
 	kids := []giode.Element{
-		giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter}, orb("qr", 40), giode.Text("Receive from a browser", stHeading)),
-		giode.Text("No app on the other phone or computer? Let them scan this code and upload in their browser.", stMuted),
+		giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter}, orb("qr", 40), giode.Text(tr("Receive from a browser"), stHeading)),
+		giode.Text(tr("No app on the other phone or computer? Let them scan this code and upload in their browser."), stMuted),
 		c.on,
 	}
 	if s.BrowserDrop {

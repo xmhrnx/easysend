@@ -19,13 +19,13 @@ type internetPanel struct {
 
 func newInternetPanel(u *UI) *internetPanel {
 	p := &internetPanel{u: u}
-	p.create = primaryButton("Create code", "zap", p.start)
+	p.create = primaryButton(tr("Create code"), "zap", p.start)
 	return p
 }
 
 func (p *internetPanel) start() {
 	if len(p.u.items) == 0 {
-		p.u.toast(giode.ToastInfo, "Choose something to send first")
+		p.u.toast(giode.ToastInfo, tr("Choose something to send first"))
 		return
 	}
 	items := append([]item.Item(nil), p.u.items...)
@@ -39,15 +39,15 @@ func (p *internetPanel) Layout(gtx layout.Context) layout.Dimensions {
 			sideBySide(giode.Styles{Width: -1, Gap: 18, Align: giode.AlignCenter},
 				orb("globe", 64),
 				giode.Stack(giode.Styles{Gap: 6, FlexGrow: 1, MinWidth: 240},
-					giode.Text("Send anywhere with a code", stHeading),
-					giode.Text("Works across the internet, between any networks. Devices connect directly when they can, through a relay when they can't.", stMuted),
+					giode.Text(tr("Send anywhere with a code"), stHeading),
+					giode.Text(tr("Works across the internet, between any networks. Devices connect directly when they can, through a relay when they can't."), stMuted),
 				),
 				p.create,
 			),
 			giode.Row(giode.Styles{Gap: 8},
-				chip("End-to-end encrypted", "theme.success"),
-				chip("Peer-to-peer", "theme.primary"),
-				chip("Works with Magic Wormhole apps", "theme.accent"),
+				chip(tr("End-to-end encrypted"), "theme.success"),
+				chip(tr("Peer-to-peer"), "theme.primary"),
+				chip(tr("Works with Magic Wormhole apps"), "theme.accent"),
 			),
 		),
 	}

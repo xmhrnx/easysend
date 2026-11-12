@@ -16,7 +16,7 @@ func newBottomNav(u *UI) *bottomNav {
 	for _, e := range navEntries {
 		e := e
 		p := giode.Pressable(func(ps giode.PressState) giode.Element { return b.item(e, ps) }, giode.Styles{FlexGrow: 1}).
-			Label(e.label).
+			Label(tr(e.label)).
 			OnClick(func(giode.ClickEvent) { u.Go(e.screen) })
 		b.items = append(b.items, p)
 	}
@@ -36,7 +36,7 @@ func (b *bottomNav) item(e navEntry, ps giode.PressState) giode.Element {
 	}
 	return giode.Stack(giode.Styles{Width: -1, Align: giode.AlignCenter, Gap: 4, Padding: giode.SymmetricInset(0, 8)},
 		giode.Box(giode.Styles{BorderWidth: 1, BorderColor: giode.Color(pill), BorderRadius: 99, Padding: giode.SymmetricInset(18, 4)}, ic),
-		giode.Text(e.label, giode.Styles{FontFamily: fontText, FontSize: 11.5, FontWeight: giode.FontWeightMedium, Color: giode.Color(fg)}),
+		giode.Text(tr(e.label), giode.Styles{FontFamily: fontText, FontSize: 11.5, FontWeight: giode.FontWeightMedium, Color: giode.Color(fg)}),
 	)
 }
 

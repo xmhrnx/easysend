@@ -26,9 +26,9 @@ const requestFilesShown = 4
 
 func newIncomingDialog(u *UI) *incomingDialog {
 	d := &incomingDialog{u: u}
-	d.accept = sheetPrimary("Accept", "check", func() { d.answer(true) })
-	d.decline = sheetSecondary("Decline", func() { d.answer(false) })
-	d.trust = giode.Input.Checkbox("Always accept from this device", giode.Styles{Color: "theme.text", Background: "theme.primary", BorderColor: "theme.border"}).Outlined(true)
+	d.accept = sheetPrimary(tr("Accept"), "check", func() { d.answer(true) })
+	d.decline = sheetSecondary(tr("Decline"), func() { d.answer(false) })
+	d.trust = giode.Input.Checkbox(tr("Always accept from this device"), giode.Styles{Color: "theme.text", Background: "theme.primary", BorderColor: "theme.border"}).Outlined(true)
 	d.sheet = newSheet(&d.open, "", d.content, func() giode.Element { return sheetActions(d.decline, d.accept) }).Dismissible(false)
 	return d
 }
@@ -44,7 +44,7 @@ func (d *incomingDialog) answer(ok bool) {
 	d.trust.SetChecked(false)
 	d.open = false
 	if ok {
-		d.u.toast(giode.ToastSuccess, "Receiving from "+d.req.Sender.Alias)
+		d.u.toast(giode.ToastSuccess, tr("Receiving from {name}", "name", d.req.Sender.Alias))
 	}
 }
 
@@ -60,15 +60,15 @@ func (d *incomingDialog) content() giode.Element {
 	files := []giode.Element{}
 	for i, f := range r.Files {
 		if i == requestFilesShown {
-			files = append(files, giode.Text("+ "+plural(len(r.Files)-requestFilesShown, "more file", "more files"), stSmall))
+			files = append(files, giode.Text(count("more_files", len(r.Files)-requestFilesShown), stSmall))
 			break
 		}
 		files = append(files, d.fileRow(f.FileName, f.Size))
 	}
-	what := "wants to send you " + plural(len(r.Files), "file", "files") + " · " + item.HumanSize(r.Total)
+	what := tr("wants to send you {files} · {size}", "files", count("files", len(r.Files)), "size", item.HumanSize(r.Total))
 	if r.Text != "" {
 		// A message: show what it says, as files show their names.
-		what = "wants to send you a message"
+		what = tr("wants to send you a message")
 		files = []giode.Element{giode.Text(r.Text, giode.Styles{FontFamily: fontText, FontSize: 14, Color: "theme.text", MaxLines: 6, TextOverflow: giode.TextOverflowEllipsis})}
 	}
 	return giode.Stack(giode.Styles{Gap: 14, Width: -1, Align: giode.AlignCenter, Padding: giode.Inset{Top: 4}},

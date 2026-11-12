@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/xmhrnx/giode/i18n"
 	"time"
 
 	"easysend/internal/item"
@@ -67,7 +68,7 @@ func (e *Engine) accept(ctx context.Context, in localsend.Incoming) localsend.Si
 	for _, f := range in.Files {
 		req.Total += f.Size
 	}
-	if !e.ask(ctx, req, in.Sender.Alias+" wants to send you files", describeFiles(in.Files, req.Total)) {
+	if !e.ask(ctx, req, i18n.Intl("{name} wants to send you files", "name", in.Sender.Alias), describeFiles(in.Files, req.Total)) {
 		return nil
 	}
 	return e.newSink(in)

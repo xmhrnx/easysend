@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/xmhrnx/giode/i18n"
 	"time"
 
 	"easysend/internal/natmap"
@@ -81,9 +82,9 @@ func (e *Engine) keepMapped(ctx context.Context) {
 	switch {
 	case ctx.Err() != nil:
 	case err != nil:
-		e.public = PublicStatus{State: PublicUnavailable, Err: "Your router didn't open a port (UPnP is off or unsupported)."}
+		e.public = PublicStatus{State: PublicUnavailable, Err: i18n.Intl("Your router didn't open a port (UPnP is off or unsupported).")}
 	case !m.IsPublic():
-		e.public = PublicStatus{State: PublicUnavailable, IP: m.ExternalIP, Err: "Your router is itself behind another network (carrier NAT), so it can't be reached from the internet."}
+		e.public = PublicStatus{State: PublicUnavailable, IP: m.ExternalIP, Err: i18n.Intl("Your router is itself behind another network (carrier NAT), so it can't be reached from the internet.")}
 	default:
 		e.mapping = m
 		e.public = PublicStatus{State: PublicReady, IP: m.ExternalIP, Port: m.ExternalPort}

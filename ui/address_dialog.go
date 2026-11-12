@@ -25,9 +25,9 @@ func newAddressDialog(u *UI) *addressDialog {
 	d := &addressDialog{u: u}
 	d.addr = giode.Input.Text("192.168.1.20 or 192.168.1.20:53317", giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 12, Color: "theme.text"}).
 		Keyboard(giode.KeyboardURL).Submit(func(string) { d.submit() })
-	d.add = sheetPrimary("Connect", "plus", d.submit)
-	d.cancel = sheetSecondary("Cancel", func() { d.isOpen = false })
-	d.sheet = newSheet(&d.isOpen, "Add a device", d.content, func() giode.Element { return sheetActions(d.cancel, d.add) })
+	d.add = sheetPrimary(tr("Connect"), "plus", d.submit)
+	d.cancel = sheetSecondary(tr("Cancel"), func() { d.isOpen = false })
+	d.sheet = newSheet(&d.isOpen, tr("Add a device"), d.content, func() giode.Element { return sheetActions(d.cancel, d.add) })
 	return d
 }
 
@@ -50,19 +50,19 @@ func (d *addressDialog) submit() {
 		d.u.app.Post(func() {
 			d.add.Loading(false)
 			if err != nil {
-				d.err = "No EasySend or LocalSend device answered at " + addr + "."
+				d.err = tr("No EasySend or LocalSend device answered at {address}.", "address", addr)
 				return
 			}
 			d.isOpen = false
 			d.addr.SetText("")
-			d.u.toast(giode.ToastSuccess, "Added "+dev.Alias)
+			d.u.toast(giode.ToastSuccess, tr("Added {name}", "name", dev.Alias))
 		})
 	}()
 }
 
 func (d *addressDialog) content() giode.Element {
 	kids := []giode.Element{
-		giode.Text("For networks that block discovery. The address is shown on the other device's Receive screen.", stMuted),
+		giode.Text(tr("For networks that block discovery. The address is shown on the other device's Receive screen."), stMuted),
 		d.addr,
 	}
 	if d.err != "" {

@@ -21,10 +21,10 @@ type composeDialog struct {
 
 func newComposeDialog(u *UI) *composeDialog {
 	d := &composeDialog{u: u}
-	d.text = giode.Input.Text("Type a message, a link, a password…", giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 12, Color: "theme.text"}).Lines(5, 12)
-	d.add = sheetPrimary("Add", "plus", d.submit)
-	d.cancel = sheetSecondary("Cancel", func() { d.isOpen = false })
-	d.sheet = newSheet(&d.isOpen, "Send text", d.content, func() giode.Element { return sheetActions(d.cancel, d.add) })
+	d.text = giode.Input.Text(tr("Type a message, a link, a password…"), giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 12, Color: "theme.text"}).Lines(5, 12)
+	d.add = sheetPrimary(tr("Add"), "plus", d.submit)
+	d.cancel = sheetSecondary(tr("Cancel"), func() { d.isOpen = false })
+	d.sheet = newSheet(&d.isOpen, tr("Send text"), d.content, func() giode.Element { return sheetActions(d.cancel, d.add) })
 	return d
 }
 
@@ -44,7 +44,7 @@ func (d *composeDialog) submit() {
 
 func (d *composeDialog) content() giode.Element {
 	return giode.Stack(giode.Styles{Gap: 12, Width: -1},
-		giode.Text("Receivers can copy it with one tap.", stMuted),
+		giode.Text(tr("Receivers can copy it with one tap."), stMuted),
 		d.text,
 	)
 }

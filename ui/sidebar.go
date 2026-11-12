@@ -19,12 +19,12 @@ func newSidebar(u *UI) *sidebar {
 	for _, e := range navEntries {
 		e := e
 		p := giode.Pressable(func(ps giode.PressState) giode.Element { return s.item(e, ps) }).
-			Label(e.label).
+			Label(tr(e.label)).
 			OnClick(func(giode.ClickEvent) { u.Go(e.screen) })
 		s.items = append(s.items, p)
 	}
 	s.self = giode.Pressable(func(ps giode.PressState) giode.Element { return s.deviceCard(ps) }).
-		Label("This device").
+		Label(tr("This device")).
 		OnClick(func(giode.ClickEvent) { u.Go(screenReceive) })
 	return s
 }
@@ -46,7 +46,7 @@ func (s *sidebar) item(e navEntry, ps giode.PressState) giode.Element {
 	}
 	kids := []giode.Element{
 		icon(e.icon, 20, ic),
-		giode.Text(e.label, giode.Styles{FontFamily: fontText, FontSize: 14.5, FontWeight: weight, Color: giode.Color(fg)}),
+		giode.Text(tr(e.label), giode.Styles{FontFamily: fontText, FontSize: 14.5, FontWeight: weight, Color: giode.Color(fg)}),
 		spacer(),
 	}
 	if n := s.u.badge(e.screen); n > 0 {
@@ -64,7 +64,7 @@ func (s *sidebar) Layout(gtx layout.Context) layout.Dimensions {
 		s.u.logoElement(38),
 		giode.Stack(giode.Styles{Gap: 0},
 			giode.Text("EasySend", giode.Styles{FontFamily: fontDisplay, FontWeight: giode.FontWeightBold, FontSize: 19, Color: "theme.text"}),
-			giode.Text("Share anything, anywhere", stSmall),
+			giode.Text(tr("Share anything, anywhere"), stSmall),
 		),
 	)
 	kids := append(append([]giode.Element{brand}, navs...), spacer())
