@@ -6,6 +6,8 @@ import (
 	"net"
 	"sort"
 	"strings"
+	"sync"
+	"time"
 )
 
 // virtualNames are parts of the names of adapters other devices on the
@@ -29,10 +31,36 @@ func LocalIPv4() []net.IP {
 	return out
 }
 
+// netsTTL is how long LocalNets reuses what it found: the UI asks for
+// addresses every frame (links, QR codes, this device's card), and
+// listing the interfaces is slow where there are many (an iPhone has
+// twenty-odd). Network changes still show within it.
+const netsTTL = 2 * time.Second
+
+var netsCache struct {
+	sync.Mutex
+	at   time.Time
+	nets []net.IPNet
+}
+
 // LocalNets is LocalIPv4 with each address's network (its subnet mask),
 // for scanning the network. Where the system doesn't say (Android 11+
 // denies apps the interface list) the network is assumed to be a /24.
+// Results are reused for netsTTL.
 func LocalNets() []net.IPNet {
+	netsCache.Lock()
+	defer netsCache.Unlock()
+	if netsCache.nets != nil && time.Since(netsCache.at) < netsTTL {
+		return append([]net.IPNet(nil), netsCache.nets...)
+	}
+	netsCache.nets, netsCache.at = localNets(), time.Now()
+	if netsCache.nets == nil {
+		netsCache.nets = []net.IPNet{} // cached too: no network is an answer
+	}
+	return append([]net.IPNet(nil), netsCache.nets...)
+}
+
+func localNets() []net.IPNet {
 	route := routeIPv4()
 	ifaces, err := net.Interfaces()
 	if err != nil {
