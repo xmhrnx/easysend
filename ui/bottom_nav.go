@@ -59,10 +59,20 @@ const (
 	navMargin = 12 // from the sides, and from the bottom without a home indicator
 )
 
+// keyboardInset is the smallest bottom inset taken for an on-screen
+// keyboard rather than a home indicator or gesture bar (at most ~48 dp).
+const keyboardInset = 120
+
 // navBottom is the gap between the bar and the window's bottom edge:
-// just above the home indicator or gesture bar, where there is one.
+// just above the home indicator or gesture bar, where there is one, and
+// above the keyboard while it's up (on iOS it's part of the bottom
+// inset; Android shrinks the window instead).
 func navBottom() int {
-	return max(navMargin, giode.SafeArea().Bottom-12)
+	b := giode.SafeArea().Bottom
+	if b >= keyboardInset {
+		return b + navMargin/2
+	}
+	return max(navMargin, b-12)
 }
 
 // navClearance is the space a page leaves at its end so its last
