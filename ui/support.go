@@ -64,9 +64,9 @@ func (s *settingsScreen) supportCard() giode.Element {
 	if s.u.help.CanDonate() {
 		rows = append(rows, settingRow("Support EasySend", donateText(), s.donate))
 	}
-	if len(rows) == 0 {
-		return giode.Box(giode.Styles{Display: giode.DisplayNone})
-	}
+	// The log a report would attach, for pasting anywhere: addresses,
+	// ports and what the networking did, with link tokens hidden.
+	rows = append(rows, settingRow("Networking log", "Copy what EasySend's networking did recently, to share when something doesn't connect.", s.copyLog))
 	return settingsCard("Help & support", "heart", rows...)
 }
 

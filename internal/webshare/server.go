@@ -13,7 +13,14 @@ import (
 // Start listens on cfg.Port, or any free port when it's taken.
 func Start(cfg Config) (*Server, error) {
 	s := &Server{cfg: cfg, shares: map[string]*Share{}, fails: map[string]int{}, batch: map[string]*uploadBatch{}}
-	s.srv = &http.Server{Handler: s.routes(), ReadHeaderTimeout: 20 * time.Second}
+	s.srv = &http.Server{Handler: s.routes(), ReadHeaderTimeout: 20 * time.Second,
+		// Every connection, before any request: tells "nothing reached
+		// this device" from "it connected but the request didn't come".
+		ConnState: func(c net.Conn, st http.ConnState) {
+			if st == http.StateNew {
+				diag.Logf("browser: connection from %s", c.RemoteAddr())
+			}
+		}}
 	if err := s.listen(cfg.Port); err != nil {
 		return nil, err
 	}
