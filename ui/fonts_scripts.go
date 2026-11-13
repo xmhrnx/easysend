@@ -12,41 +12,52 @@ import (
 // scriptFaces returns the Noto Sans faces for scripts Inter lacks, each under
 // its own family name so they act as per-glyph fallbacks behind Inter.
 func scriptFaces() ([]font.FontFace, error) {
-	type face struct {
-		data   []byte
-		family string
-		weight font.Weight
+	// Each script's Regular and Bold files (Bold nil where Noto ships a
+	// Regular-only subset).
+	scripts := []struct {
+		family        string
+		regular, bold []byte
+	}{
+		{"Noto Sans Georgian", assets.NotoSansGeorgianRegular, assets.NotoSansGeorgianBold},
+		{"Noto Sans Armenian", assets.NotoSansArmenianRegular, assets.NotoSansArmenianBold},
+		{"Noto Sans Hebrew", assets.NotoSansHebrewRegular, assets.NotoSansHebrewBold},
+		{"Noto Sans Arabic", assets.NotoSansArabicRegular, assets.NotoSansArabicBold},
+		{"Noto Sans Devanagari", assets.NotoSansDevanagariRegular, assets.NotoSansDevanagariBold},
+		{"Noto Sans Thai", assets.NotoSansThaiRegular, assets.NotoSansThaiBold},
+		{"Noto Sans SC", assets.NotoSansSCRegular, nil},
+		{"Noto Sans JP", assets.NotoSansJPRegular, nil},
+		{"Noto Sans KR", assets.NotoSansKRRegular, nil},
 	}
-	faces := []face{
-		{assets.NotoSansGeorgianRegular, "Noto Sans Georgian", font.Normal},
-		{assets.NotoSansGeorgianBold, "Noto Sans Georgian", font.Bold},
-		{assets.NotoSansArmenianRegular, "Noto Sans Armenian", font.Normal},
-		{assets.NotoSansArmenianBold, "Noto Sans Armenian", font.Bold},
-		{assets.NotoSansHebrewRegular, "Noto Sans Hebrew", font.Normal},
-		{assets.NotoSansHebrewBold, "Noto Sans Hebrew", font.Bold},
-		{assets.NotoSansArabicRegular, "Noto Sans Arabic", font.Normal},
-		{assets.NotoSansArabicBold, "Noto Sans Arabic", font.Bold},
-		{assets.NotoSansDevanagariRegular, "Noto Sans Devanagari", font.Normal},
-		{assets.NotoSansDevanagariBold, "Noto Sans Devanagari", font.Bold},
-		{assets.NotoSansThaiRegular, "Noto Sans Thai", font.Normal},
-		{assets.NotoSansThaiBold, "Noto Sans Thai", font.Bold},
-		{assets.NotoSansSCRegular, "Noto Sans SC", font.Normal},
-		{assets.NotoSansSCRegular, "Noto Sans SC", font.Bold}, // Regular-only subset; the shaper skips a family with no Bold
-		{assets.NotoSansJPRegular, "Noto Sans JP", font.Normal},
-		{assets.NotoSansJPRegular, "Noto Sans JP", font.Bold}, // Regular-only subset; the shaper skips a family with no Bold
-		{assets.NotoSansKRRegular, "Noto Sans KR", font.Normal},
-		{assets.NotoSansKRRegular, "Noto Sans KR", font.Bold}, // Regular-only subset; the shaper skips a family with no Bold
+	// Every weight the styles use. The shaper falls back to another
+	// family for glyphs Inter lacks only among faces of the weight asked
+	// for: with just Regular and Bold registered, Medium and SemiBold
+	// text (the sidebar, buttons) in these scripts drew as boxes.
+	// Medium uses the Regular file and SemiBold the Bold one.
+	weights := []struct {
+		weight font.Weight
+		bold   bool
+	}{
+		{font.Normal, false},
+		{font.Medium, false},
+		{font.SemiBold, true},
+		{font.Bold, true},
 	}
 	var all []font.FontFace
-	for _, f := range faces {
-		parsed, err := opentype.ParseCollection(f.data)
-		if err != nil {
-			return nil, fmt.Errorf("font %s: %w", f.family, err)
-		}
-		for _, p := range parsed {
-			p.Font.Typeface = font.Typeface(f.family)
-			p.Font.Weight = f.weight
-			all = append(all, p)
+	for _, sc := range scripts {
+		for _, w := range weights {
+			data := sc.regular
+			if w.bold && sc.bold != nil {
+				data = sc.bold
+			}
+			parsed, err := opentype.ParseCollection(data)
+			if err != nil {
+				return nil, fmt.Errorf("font %s: %w", sc.family, err)
+			}
+			for _, p := range parsed {
+				p.Font.Typeface = font.Typeface(sc.family)
+				p.Font.Weight = w.weight
+				all = append(all, p)
+			}
 		}
 	}
 	return all, nil

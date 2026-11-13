@@ -37,7 +37,6 @@ func main() {
 		log.Printf("settings: %v", err)
 	}
 	s := prefs.Get()
-	ui.ApplyLanguage(s.Language)
 	startInTray := giode.StartInTrayAtLogin
 	if s.StartHidden {
 		startInTray = giode.StartInTrayAlways
@@ -55,8 +54,11 @@ func main() {
 		u   *ui.UI
 	)
 	app = giode.New(giode.Config{
-		Title:          "EasySend",
-		Intl:           &giode.IntlOptions{FS: locales.FS, Dir: ".", Fallback: "en"},
+		Title: "EasySend",
+		Intl:  &giode.IntlOptions{FS: locales.FS, Dir: ".", Fallback: "en"},
+		// The saved language: giode.New sets the locale itself (to the
+		// system's when this is empty), so setting it before New was lost.
+		Locale:         s.Language,
 		Size:           image.Pt(1180, 800),
 		MinSize:        image.Pt(380, 560),
 		Resizable:      true,
