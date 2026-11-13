@@ -90,7 +90,7 @@ firewall_public = true       # also on networks Windows marks Public (many home 
 [windows.msix]                    # Microsoft Store: Partner Center → EasySend → Product identity
 identity_name = "MehranZahir.EasySend"
 publisher = "CN=B40E8F57-A7E0-40BB-8E74-5D051D0B578B"
-publisher_display_name = "Mehran Zahir"
+publisher_display_name = "Mehran Zahiroddini"
 startup_task = true
 
 [linux]
