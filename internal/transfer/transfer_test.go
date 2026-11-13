@@ -1,6 +1,9 @@
 package transfer
 
 import (
+	"github.com/xmhrnx/giode/i18n"
+
+	"easysend/locales"
 	"testing"
 )
 
@@ -19,6 +22,11 @@ func TestRegistry(t *testing.T) {
 	if len(list) != 1 || list[0].Status != Done || list[0].Progress() != 1 {
 		t.Fatalf("%+v", list)
 	}
+	// Title is translated: load the app's English messages.
+	if err := i18n.Load(locales.FS, "."); err != nil {
+		t.Fatal(err)
+	}
+	i18n.SetLocale("en")
 	if list[0].Title() != "2 files" {
 		t.Fatal(list[0].Title())
 	}
