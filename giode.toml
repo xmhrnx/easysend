@@ -19,6 +19,8 @@ schemes = ["wormhole-transfer"]  # internet codes scanned as QR codes open EasyS
 
 [android]
 min_sdk = 24
+# Google Play requires Android 16 (API 36) for new apps and updates since 31 Aug 2026
+target_sdk = 36
 permissions = [
   "network",
   "networkstate",
@@ -30,7 +32,10 @@ keep_alive = true            # App.KeepAlive keeps transfers running in the back
 icon_foreground = "assets/android-foreground.png"
 icon_background = "assets/android-background.png"
 icon_monochrome = "assets/android-monochrome.png"
-# keystore = "release.keystore"   # created by giode keystore; signs giode build -release
+# Signs giode build -release (the Play upload key; created by giode
+# keystore, kept out of git). The release workflow writes it from the
+# ANDROID_KEYSTORE_BASE64 secret, with GIODE_KEYSTORE_PASS.
+keystore = "release.keystore"
 
 [ios]
 min_os = 15
@@ -126,7 +131,10 @@ folders = true
 
 # GitHub Actions (giode ci writes .github/workflows/release.yml from this;
 # rerun `giode ci -f` after changing it). Builds only when a GitHub release
-# is published, and attaches the packages to that release.
+# is published, and attaches the packages to that release. After
+# regenerating, redo two edits by hand: pin the CLI
+# (giode-cli/cmd/giode@v0.1.35-alpha.1, not @latest) and use
+# go-version-file: go.mod instead of go-version: stable.
 [ci]
 trigger = "release"
 test = ""                         # no test job: go vet and go test run before each push, not on release
