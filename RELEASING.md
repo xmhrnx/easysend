@@ -105,6 +105,12 @@ request the entitlement (devices can still be added by IP address).
    in `giode.toml`, since Google Play requires API 36 for new apps and updates
    since 31 August 2026. The build compiles against the newest Android
    platform installed on the runner.
+   Targeting 36 turns on predictive back, and Gio handles back in
+   `onBackPressed()`, which Android 16 then no longer calls; so
+   `application_attributes` sets `enableOnBackInvokedCallback="false"`.
+   Before each Play upload, test the back gesture on an Android 16 device:
+   it must go back a screen (out of Settings, out of a transfer), not close
+   the app.
 6. Declarations in App content:
    - **Foreground service** (`FOREGROUND_SERVICE_DATA_SYNC`): transfers the user
      starts keep running while the app is in the background. Play asks for a

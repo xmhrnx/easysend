@@ -21,6 +21,10 @@ schemes = ["wormhole-transfer"]  # internet codes scanned as QR codes open EasyS
 min_sdk = 24
 # Google Play requires Android 16 (API 36) for new apps and updates since 31 Aug 2026
 target_sdk = 36
+# Gio's activity handles back in onBackPressed(), which Android 16 no longer
+# calls for apps targeting API 36 (predictive back): opt out, or the back
+# gesture closes the app instead of going back a screen.
+application_attributes = { enableOnBackInvokedCallback = "false" }
 permissions = [
   "network",
   "networkstate",
