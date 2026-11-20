@@ -27,3 +27,6 @@ func DownloadDir() string {
 	}
 	return filepath.Join(home, "Downloads", "EasySend")
 }
+
+// CanOpenFolders says OpenFolder can show a folder in a file manager.
+const CanOpenFolders = true

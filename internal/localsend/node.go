@@ -38,6 +38,10 @@ type Config struct {
 	OnText func(ctx context.Context, from Device, text string) bool
 	// OnDevices runs after the device list changes.
 	OnDevices func()
+	// Routes adds EasySend's own endpoints (folder sync) to the server,
+	// beside the LocalSend ones. Handlers learn who's asking with
+	// PeerFingerprint.
+	Routes func(mux *http.ServeMux)
 }
 
 // Node is a LocalSend peer: a server for incoming transfers, discovery and
@@ -95,7 +99,9 @@ func (n *Node) listen(port int) error {
 	n.port.Store(int32(ln.Addr().(*net.TCPAddr).Port))
 	diag.Logf("nearby: listening on TCP %d (%s)", n.Port(), n.protocol)
 	if n.cfg.Cert != nil {
-		ln = tls.NewListener(ln, &tls.Config{Certificates: []tls.Certificate{*n.cfg.Cert}, MinVersion: tls.VersionTLS12})
+		// Clients may present their own certificate (EasySend does, for
+		// folder sync); it isn't required, and LocalSend's don't.
+		ln = tls.NewListener(ln, &tls.Config{Certificates: []tls.Certificate{*n.cfg.Cert}, MinVersion: tls.VersionTLS12, ClientAuth: tls.RequestClientCert})
 	}
 	n.ln = ln
 	go func() {

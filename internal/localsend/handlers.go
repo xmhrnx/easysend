@@ -17,6 +17,9 @@ func (n *Node) routes() http.Handler {
 	mux.HandleFunc("POST "+apiBase+"/prepare-upload", n.handlePrepare)
 	mux.HandleFunc("POST "+apiBase+"/upload", n.handleUpload)
 	mux.HandleFunc("POST "+apiBase+"/cancel", n.handleCancel)
+	if n.cfg.Routes != nil {
+		n.cfg.Routes(mux)
+	}
 	return mux
 }
 

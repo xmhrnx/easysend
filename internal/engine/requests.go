@@ -16,9 +16,14 @@ type Request struct {
 	Files  []localsend.FileMeta
 	Total  int64
 	// Text is the message of a text-only request, which has no files.
-	Text     string
-	Received time.Time
-	answer   chan bool
+	Text string
+	// SyncFolder is the name of a folder the sender offers to sync, for a
+	// sync invitation (which has no files); SyncRoot is where it will be
+	// kept here, which AnswerSync can change.
+	SyncFolder string
+	SyncRoot   string
+	Received   time.Time
+	answer     chan bool
 }
 
 // Requests returns the transfers waiting for an answer, oldest first.
@@ -33,7 +38,13 @@ func (e *Engine) Requests() []Request {
 }
 
 // Answer accepts or declines a request.
-func (e *Engine) Answer(id string, accept bool) {
+func (e *Engine) Answer(id string, accept bool) { e.answer(id, accept, "") }
+
+// AnswerSync answers a sync invitation, keeping the folder at root (the
+// suggested place when root is "").
+func (e *Engine) AnswerSync(id string, accept bool, root string) { e.answer(id, accept, root) }
+
+func (e *Engine) answer(id string, accept bool, root string) {
 	e.mu.Lock()
 	var r *Request
 	for i, q := range e.requests {
@@ -42,6 +53,9 @@ func (e *Engine) Answer(id string, accept bool) {
 			e.requests = append(e.requests[:i], e.requests[i+1:]...)
 			break
 		}
+	}
+	if r != nil && root != "" {
+		r.SyncRoot = root
 	}
 	e.mu.Unlock()
 	if r != nil {
@@ -76,7 +90,7 @@ func (e *Engine) accept(ctx context.Context, in localsend.Incoming) localsend.Si
 // ask waits for the user to accept req (at once for senders accepted
 // automatically) and reports the answer; a sender giving up declines.
 func (e *Engine) ask(ctx context.Context, req *Request, title, body string) bool {
-	if e.autoAccepts(req.Sender) {
+	if req.SyncFolder == "" && e.autoAccepts(req.Sender) {
 		return true
 	}
 	e.mu.Lock()

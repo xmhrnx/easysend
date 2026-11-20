@@ -6,10 +6,13 @@ package engine
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"easysend/internal/diag"
+	"easysend/internal/foldersync"
 	"easysend/internal/localsend"
 	"easysend/internal/netutil"
 	"easysend/internal/settings"
@@ -39,6 +42,19 @@ func Start(cfg Config) (*Engine, error) {
 		return nil, fmt.Errorf("certificate: %w", err)
 	}
 	s := st.Get()
+	e.sync, err = foldersync.New(foldersync.Config{
+		Dir:      filepath.Join(cfg.DataDir, "sync"),
+		Self:     fp,
+		Name:     func() string { return e.Settings.Get().DeviceName },
+		Client:   func(peer string) *http.Client { return e.node.PinnedClient(peer) },
+		Resolve:  e.resolveDevice,
+		PeerFP:   localsend.PeerFingerprint,
+		OnInvite: e.onSyncInvite,
+		OnChange: e.changed,
+	})
+	if err != nil {
+		return nil, err
+	}
 	e.node, err = localsend.Start(localsend.Config{
 		Self:         e.selfInfo,
 		Cert:         &cert,
@@ -49,6 +65,7 @@ func Start(cfg Config) (*Engine, error) {
 		Accept:       e.accept,
 		OnText:       e.onNearbyText,
 		OnDevices:    e.changed,
+		Routes:       e.sync.Routes,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("nearby sharing: %w", err)
@@ -69,6 +86,7 @@ func Start(cfg Config) (*Engine, error) {
 		return nil, fmt.Errorf("browser sharing: %w", err)
 	}
 	e.applyPublic()
+	e.sync.Start()
 	diag.Logf("adapters:\n%s", netutil.Describe())
 	diag.Logf("links use %s; nearby port %d, browser port %d", e.LANBase(), e.node.Port(), e.web.Port())
 	go func() {
@@ -101,6 +119,7 @@ func (e *Engine) Close() {
 		_ = m.Remove(ctx)
 		cancel()
 	}
+	e.sync.Close()
 	e.node.Close()
 	e.web.Close()
 }

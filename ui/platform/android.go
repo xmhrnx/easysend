@@ -23,3 +23,6 @@ const DeviceType = localsend.TypeMobile
 func DownloadDir() string {
 	return filepath.Join(DataDir(), "Received")
 }
+
+// CanOpenFolders says OpenFolder can show a folder in a file manager.
+const CanOpenFolders = false

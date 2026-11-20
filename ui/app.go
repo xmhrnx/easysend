@@ -23,6 +23,7 @@ type screen int
 const (
 	screenSend screen = iota
 	screenReceive
+	screenSync
 	screenActivity
 	screenSettings
 )
@@ -42,6 +43,7 @@ type UI struct {
 	bottomNav *bottomNav
 	send      *sendScreen
 	receive   *receiveScreen
+	sync      *syncScreen
 	activity  *activityScreen
 	settings  *settingsScreen
 
@@ -49,8 +51,12 @@ type UI struct {
 	pin      *pinDialog
 	compose  *composeDialog
 	address  *addressDialog
-	toasts   *giode.ToasterElement
-	help     *support.Support // report form, donations
+	// Folder sync's sheets.
+	newFolder   *newFolderDialog
+	syncDevices *syncDevicesDialog
+	confirm     *confirmDialog
+	toasts      *giode.ToasterElement
+	help        *support.Support // report form, donations
 }
 
 // New builds the interface for a running engine.
@@ -68,12 +74,16 @@ func New(app *giode.App, eng *engine.Engine) *UI {
 	u.bottomNav = newBottomNav(u)
 	u.send = newSendScreen(u)
 	u.receive = newReceiveScreen(u)
+	u.sync = newSyncScreen(u)
 	u.activity = newActivityScreen(u)
 	u.settings = newSettingsScreen(u)
 	u.incoming = newIncomingDialog(u)
 	u.pin = newPINDialog(u)
 	u.compose = newComposeDialog(u)
 	u.address = newAddressDialog(u)
+	u.newFolder = newNewFolderDialog(u)
+	u.syncDevices = newSyncDevicesDialog(u)
+	u.confirm = newConfirmDialog()
 	u.ApplyTheme()
 	return u
 }
@@ -90,7 +100,7 @@ func (u *UI) ApplyTheme() {
 // View is the root view, run every frame.
 func (u *UI) View() giode.Element {
 	page := u.page()
-	overlays := []giode.Element{u.incoming, u.pin, u.compose, u.address, u.help, u.toasts}
+	overlays := []giode.Element{u.incoming, u.pin, u.compose, u.address, u.newFolder, u.syncDevices, u.confirm, u.help, u.toasts}
 	// The app is drawn edge to edge (Config.EdgeToEdge): the page runs
 	// under the status bar and home indicator, padded clear of them, and
 	// on phones the tab bar floats over it.
@@ -134,6 +144,8 @@ func (u *UI) page() giode.Element {
 	switch u.current {
 	case screenReceive:
 		return u.receive
+	case screenSync:
+		return u.sync
 	case screenActivity:
 		return u.activity
 	case screenSettings:

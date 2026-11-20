@@ -10,6 +10,7 @@ type navEntry struct {
 var navEntries = []navEntry{
 	{screenSend, "Send", "send"},
 	{screenReceive, "Receive", "inbox"},
+	{screenSync, "Sync", "sync"},
 	{screenActivity, "Activity", "history"},
 	{screenSettings, "Settings", "settings"},
 }

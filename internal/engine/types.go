@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"easysend/internal/foldersync"
 	"sync"
 
 	"easysend/internal/localsend"
@@ -43,6 +44,7 @@ type Engine struct {
 
 	node *localsend.Node
 	web  *webshare.Server
+	sync *foldersync.Manager
 
 	mu       sync.Mutex
 	requests []*Request
